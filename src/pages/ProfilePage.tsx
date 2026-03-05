@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { User, Save, Loader2, Shield } from 'lucide-react';
+import { User, Save, Loader2, Shield, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { NIGERIAN_STATES, AFFILIATIONS } from '@/lib/constants';
@@ -128,6 +128,19 @@ const ProfilePage = () => {
           <Button onClick={handleSave} disabled={saving} className="w-full">
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save Profile
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              const url = `${window.location.origin}/reputation/${user?.id}`;
+              navigator.clipboard.writeText(url);
+              toast.success('Public profile link copied!');
+            }}
+          >
+            <Share2 className="mr-2 h-4 w-4" />
+            Share Public Profile
           </Button>
         </CardContent>
       </Card>

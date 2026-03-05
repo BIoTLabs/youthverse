@@ -10,6 +10,7 @@ import VerificationQueue from '@/components/admin/VerificationQueue';
 import CarbonCreditsTab from '@/components/admin/CarbonCreditsTab';
 import SurvivalChecksTab from '@/components/admin/SurvivalChecksTab';
 import NationalDashboard from '@/components/admin/NationalDashboard';
+import ImpactReportsTab from '@/components/admin/ImpactReportsTab';
 
 const AdminPage = () => {
   const { user, roles } = useAuth();
@@ -132,13 +133,14 @@ const AdminPage = () => {
       <AdminStats stats={stats} />
 
       <Tabs defaultValue={isNationalAdmin ? 'national' : 'skills'}>
-        <TabsList className={`grid w-full ${isNationalAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
+        <TabsList className={`grid w-full ${isNationalAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
           {isNationalAdmin && <TabsTrigger value="national">National</TabsTrigger>}
           <TabsTrigger value="skills">Skills ({pendingSkills.length})</TabsTrigger>
           <TabsTrigger value="trees">Trees ({pendingTrees.length})</TabsTrigger>
           <TabsTrigger value="gigs">Gigs ({pendingGigs.length})</TabsTrigger>
           <TabsTrigger value="survival">Survival</TabsTrigger>
           <TabsTrigger value="carbon">Carbon</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
         </TabsList>
 
         {isNationalAdmin && (
@@ -160,6 +162,9 @@ const AdminPage = () => {
         </TabsContent>
         <TabsContent value="carbon">
           <CarbonCreditsTab />
+        </TabsContent>
+        <TabsContent value="reports">
+          <ImpactReportsTab />
         </TabsContent>
       </Tabs>
     </motion.div>

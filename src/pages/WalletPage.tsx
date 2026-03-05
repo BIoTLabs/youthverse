@@ -4,18 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Wallet, ArrowUpRight, ArrowDownLeft, Award, ShoppingBag, Copy, ExternalLink, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Wallet, ArrowUpRight, ArrowDownLeft, Award, ShoppingBag, Copy, ExternalLink, Loader2, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { generateWalletFromUserId, shortenAddress, shortenTxHash, CHAIN_CONFIG } from '@/lib/blockchain';
+import YouthInvestmentFund from '@/components/wallet/YouthInvestmentFund';
 
 const WalletPage = () => {
   const { user, profile } = useAuth();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [marketplace, setMarketplace] = useState<any[]>([]);
   const [redeeming, setRedeeming] = useState<string | null>(null);
-  const [tab, setTab] = useState<'history' | 'redeem'>('history');
+  const [tab, setTab] = useState<'history' | 'redeem' | 'fund'>('history');
 
   const walletAddress = user ? generateWalletFromUserId(user.id).address : '';
 
@@ -42,26 +42,16 @@ const WalletPage = () => {
     try {
       const voucherCode = `YW-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
       const { error } = await supabase.from('redemptions').insert({
-        user_id: user.id,
-        item_id: item.id,
-        zlto_spent: item.zlto_cost,
-        voucher_code: voucherCode,
+        user_id: user.id, item_id: item.id, zlto_spent: item.zlto_cost, voucher_code: voucherCode,
       });
       if (error) throw error;
-      // Record transaction
       await supabase.from('zlto_transactions').insert({
-        user_id: user.id,
-        amount: -item.zlto_cost,
-        tx_type: 'redemption',
-        description: `Redeemed: ${item.title}`,
+        user_id: user.id, amount: -item.zlto_cost, tx_type: 'redemption', description: `Redeemed: ${item.title}`,
       });
-      // Update balance
       await supabase.from('profiles').update({
         zlto_balance: (profile.zlto_balance || 0) - item.zlto_cost,
       }).eq('user_id', user.id);
-
       toast.success(`Redeemed! Your voucher: ${voucherCode}`);
-      // Refresh
       const { data } = await supabase.from('zlto_transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       setTransactions(data || []);
     } catch (err: any) {
@@ -95,7 +85,7 @@ const WalletPage = () => {
             <span className="text-sm text-sidebar-foreground/80">Zlto Wallet</span>
           </div>
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="font-display text-4xl font-bold text-sidebar-foreground animate-count-up">
+            <span className="font-display text-4xl font-bold text-sidebar-foreground">
               {profile?.zlto_balance || 0}
             </span>
             <span className="text-sm text-sidebar-foreground/60">ZLTO</span>
@@ -114,12 +104,17 @@ const WalletPage = () => {
         </CardContent>
       </Card>
 
-      <div className="flex gap-2">
-        <Button variant={tab === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setTab('history')}>Transaction History</Button>
+      <div className="flex gap-2 flex-wrap">
+        <Button variant={tab === 'history' ? 'default' : 'outline'} size="sm" onClick={() => setTab('history')}>History</Button>
         <Button variant={tab === 'redeem' ? 'default' : 'outline'} size="sm" onClick={() => setTab('redeem')}>
           <ShoppingBag className="mr-1 h-3.5 w-3.5" />Marketplace
         </Button>
+        <Button variant={tab === 'fund' ? 'default' : 'outline'} size="sm" onClick={() => setTab('fund')}>
+          <Rocket className="mr-1 h-3.5 w-3.5" />Investment Fund
+        </Button>
       </div>
+
+      {tab === 'fund' && <YouthInvestmentFund />}
 
       {tab === 'history' && (
         <div className="space-y-2">
