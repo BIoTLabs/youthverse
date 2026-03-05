@@ -98,6 +98,30 @@ export type Database = {
         }
         Relationships: []
       }
+      custodial_wallets: {
+        Row: {
+          address: string
+          created_at: string | null
+          encrypted_private_key: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          encrypted_private_key: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          encrypted_private_key?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gig_applications: {
         Row: {
           cover_letter: string | null
@@ -286,6 +310,24 @@ export type Database = {
           partner?: string | null
           title?: string
           zlto_cost?: number
+        }
+        Relationships: []
+      }
+      platform_config: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          value?: string
         }
         Relationships: []
       }
