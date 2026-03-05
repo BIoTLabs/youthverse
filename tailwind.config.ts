@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Sora"', 'system-ui', 'sans-serif'],
+        body: ['"Inter"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,12 +55,15 @@ export default {
           DEFAULT: "hsl(var(--zlto-gold))",
           foreground: "hsl(var(--zlto-gold-foreground))",
         },
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          light: "hsl(var(--navy-light))",
+        electric: {
+          DEFAULT: "hsl(var(--electric))",
+          glow: "hsl(var(--electric-glow))",
         },
-        "green-light": "hsl(var(--green-light))",
-        "green-dark": "hsl(var(--green-dark))",
+        slate: {
+          deep: "hsl(var(--slate-deep))",
+          mid: "hsl(var(--slate-mid))",
+          light: "hsl(var(--slate-light))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -87,8 +90,8 @@ export default {
           to: { height: "0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 0 0 hsl(42 92% 56% / 0.4)" },
-          "50%": { boxShadow: "0 0 20px 4px hsl(42 92% 56% / 0.2)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(145 80% 42% / 0.4)" },
+          "50%": { boxShadow: "0 0 30px 8px hsl(145 80% 42% / 0.15)" },
         },
         "slide-up": {
           from: { transform: "translateY(16px)", opacity: "0" },
@@ -98,13 +101,18 @@ export default {
           from: { opacity: "0", transform: "scale(0.5)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
         "slide-up": "slide-up 0.4s ease-out",
         "count-up": "count-up 0.6s ease-out",
+        "float": "float 6s ease-in-out infinite",
       },
     },
   },
