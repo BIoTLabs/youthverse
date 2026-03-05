@@ -21,21 +21,35 @@ const PublicProfilePage = () => {
 
   const fetchProfile = async () => {
     setLoading(true);
-    const [prof, skills, gigs, trees] = await Promise.all([
-      supabase.from('profiles').select('*').eq('user_id', userId!).single(),
+    // Use security definer function to get public profile data (no PII)
+    const { data: profData } = await supabase.rpc('get_public_profile', { _user_id: userId! });
+    
+    if (profData) {
+      setProfile(profData);
+      // Stats come from the public profile function
+      setStats({
+        skills: 0,
+        gigs: 0,
+        trees: 0,
+        zlto: (profData as any)?.zlto_balance || 0,
+      });
+    }
+    
+    // Fetch verified credentials (these are the user's own public achievements)
+    // Only authenticated users can view these via RLS
+    const [skills, gigs, trees] = await Promise.all([
       supabase.from('skill_completions').select('*, courses(title, category)').eq('user_id', userId!).eq('verified', true),
       supabase.from('gig_applications').select('id', { count: 'exact', head: true }).eq('user_id', userId!).eq('status', 'verified'),
       supabase.from('tree_submissions').select('id', { count: 'exact', head: true }).eq('user_id', userId!).in('status', ['verified', 'alive']),
     ]);
 
-    setProfile(prof.data);
     setCredentials(skills.data || []);
-    setStats({
+    setStats(prev => ({
+      ...prev,
       skills: skills.data?.length || 0,
       gigs: gigs.count || 0,
       trees: trees.count || 0,
-      zlto: prof.data?.zlto_balance || 0,
-    });
+    }));
     setLoading(false);
   };
 
