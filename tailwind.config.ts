@@ -51,9 +51,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        zlto: {
-          DEFAULT: "hsl(var(--zlto-gold))",
-          foreground: "hsl(var(--zlto-gold-foreground))",
+        sigma: {
+          DEFAULT: "hsl(var(--sigma-gold))",
+          foreground: "hsl(var(--sigma-gold-foreground))",
         },
         electric: {
           DEFAULT: "hsl(var(--electric))",

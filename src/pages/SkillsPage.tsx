@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { BookOpen, Award, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { simulateTransaction, createCredentialHash } from '@/lib/blockchain';
+import { createCredentialHash } from '@/lib/blockchain';
 
 const SkillsPage = () => {
   const { user } = useAuth();
@@ -36,32 +36,23 @@ const SkillsPage = () => {
     if (!user || !selectedCourse) return;
     setSubmitting(true);
     try {
-      // Check if already submitted
       const existing = completions.find(c => c.course_id === selectedCourse.id);
       if (existing) {
         toast.error('You already submitted this course.');
         return;
       }
-      // Simulate blockchain credential issuance
       const credHash = createCredentialHash(user.id, selectedCourse.id, Date.now());
-      const txHash = await simulateTransaction('skill_credential', {
-        userId: user.id,
-        courseId: selectedCourse.id,
-        credentialHash: credHash,
-      });
 
       const { error } = await supabase.from('skill_completions').insert({
         user_id: user.id,
         course_id: selectedCourse.id,
         completion_code: completionCode,
-        tx_hash: txHash,
       });
       if (error) throw error;
 
       toast.success(`Course submitted! Pending admin verification.`);
       setCompletionCode('');
       setSelectedCourse(null);
-      // Refresh
       const { data } = await supabase.from('skill_completions').select('*, courses(title)').eq('user_id', user.id);
       setCompletions(data || []);
     } catch (err: any) {
@@ -75,7 +66,7 @@ const SkillsPage = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold">Skills Pillar</h1>
-        <p className="text-sm text-muted-foreground">Complete NiYA Academy courses to earn Zlto and verified credentials.</p>
+        <p className="text-sm text-muted-foreground">Complete NiYA Academy courses to earn Sigma and verified credentials.</p>
       </div>
 
       {/* My Completions */}
@@ -92,7 +83,7 @@ const SkillsPage = () => {
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate">{c.courses?.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {c.verified ? `+${c.zlto_awarded} ZLTO earned` : 'Pending verification'}
+                      {c.verified ? `+${c.zlto_awarded} SIGMA earned` : 'Pending verification'}
                     </p>
                   </div>
                   <Badge variant={c.verified ? 'default' : 'secondary'} className="text-[10px]">
@@ -125,8 +116,8 @@ const SkillsPage = () => {
                         <Badge variant="outline" className="text-[10px]">{course.provider}</Badge>
                         {course.category && <Badge variant="secondary" className="text-[10px]">{course.category}</Badge>}
                         <div className="flex items-center gap-1 text-xs">
-                          <Award className="h-3 w-3 text-zlto" />
-                          <span className="font-medium text-zlto">{course.zlto_reward} ZLTO</span>
+                          <Award className="h-3 w-3 text-sigma" />
+                          <span className="font-medium text-sigma">{course.zlto_reward} SIGMA</span>
                         </div>
                       </div>
                     </div>
@@ -149,7 +140,7 @@ const SkillsPage = () => {
                         <div className="space-y-4">
                           <p className="text-sm text-muted-foreground">
                             Enter your completion code for <strong>{course.title}</strong> to earn{' '}
-                            <strong>{course.zlto_reward} ZLTO</strong>.
+                            <strong>{course.zlto_reward} SIGMA</strong>.
                           </p>
                           <div className="space-y-2">
                             <Label>Completion Code</Label>
@@ -161,7 +152,7 @@ const SkillsPage = () => {
                           </div>
                           <Button onClick={handleSubmit} disabled={submitting} className="w-full">
                             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {submitting ? 'Issuing credential on-chain...' : 'Submit for Verification'}
+                            Submit for Verification
                           </Button>
                         </div>
                       </DialogContent>

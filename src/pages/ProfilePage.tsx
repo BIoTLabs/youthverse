@@ -12,7 +12,7 @@ import { User, Save, Loader2, Shield, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { NIGERIAN_STATES, AFFILIATIONS } from '@/lib/constants';
-import { generateWalletFromUserId, shortenAddress } from '@/lib/blockchain';
+import { shortenAddress } from '@/lib/blockchain';
 
 const ProfilePage = () => {
   const { user, profile, roles } = useAuth();
@@ -26,7 +26,7 @@ const ProfilePage = () => {
     affiliations: profile?.affiliations || [],
   });
 
-  const walletAddress = user ? generateWalletFromUserId(user.id).address : '';
+  const walletAddress = profile?.wallet_address || '';
 
   const handleSave = async () => {
     if (!user) return;
@@ -38,7 +38,6 @@ const ProfilePage = () => {
       lga: form.lga,
       bio: form.bio,
       affiliations: form.affiliations,
-      wallet_address: walletAddress,
     }).eq('user_id', user.id);
     if (error) toast.error(error.message);
     else toast.success('Profile updated!');

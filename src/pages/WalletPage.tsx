@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Wallet, ArrowUpRight, ArrowDownLeft, Award, ShoppingBag, Copy, ExternalLink, Loader2, Rocket } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { generateWalletFromUserId, shortenAddress, shortenTxHash, CHAIN_CONFIG } from '@/lib/blockchain';
+import { shortenAddress, shortenTxHash, CHAIN_CONFIG } from '@/lib/blockchain';
 import YouthInvestmentFund from '@/components/wallet/YouthInvestmentFund';
 
 const WalletPage = () => {
@@ -17,7 +17,7 @@ const WalletPage = () => {
   const [redeeming, setRedeeming] = useState<string | null>(null);
   const [tab, setTab] = useState<'history' | 'redeem' | 'fund'>('history');
 
-  const walletAddress = user ? generateWalletFromUserId(user.id).address : '';
+  const walletAddress = profile?.wallet_address || '';
 
   useEffect(() => {
     if (!user) return;
@@ -35,7 +35,7 @@ const WalletPage = () => {
   const handleRedeem = async (item: any) => {
     if (!user || !profile) return;
     if ((profile.zlto_balance || 0) < item.zlto_cost) {
-      toast.error('Insufficient Zlto balance');
+      toast.error('Insufficient Sigma balance');
       return;
     }
     setRedeeming(item.id);
@@ -82,24 +82,28 @@ const WalletPage = () => {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-1">
             <Wallet className="h-5 w-5 text-secondary" />
-            <span className="text-sm text-sidebar-foreground/80">Zlto Wallet</span>
+            <span className="text-sm text-sidebar-foreground/80">Sigma Wallet</span>
           </div>
           <div className="flex items-baseline gap-2 mb-3">
             <span className="font-display text-4xl font-bold text-sidebar-foreground">
               {profile?.zlto_balance || 0}
             </span>
-            <span className="text-sm text-sidebar-foreground/60">ZLTO</span>
+            <span className="text-sm text-sidebar-foreground/60">SIGMA</span>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="border-sidebar-foreground/20 text-sidebar-foreground/70 text-[10px] font-mono">
               {shortenAddress(walletAddress)}
             </Badge>
-            <button onClick={() => { navigator.clipboard.writeText(walletAddress); toast.success('Copied!'); }}>
-              <Copy className="h-3 w-3 text-sidebar-foreground/50" />
-            </button>
-            <a href={`${CHAIN_CONFIG.blockExplorer}/address/${walletAddress}`} target="_blank" rel="noopener" className="ml-auto">
-              <ExternalLink className="h-3 w-3 text-sidebar-foreground/50" />
-            </a>
+            {walletAddress && (
+              <>
+                <button onClick={() => { navigator.clipboard.writeText(walletAddress); toast.success('Copied!'); }}>
+                  <Copy className="h-3 w-3 text-sidebar-foreground/50" />
+                </button>
+                <a href={`${CHAIN_CONFIG.blockExplorer}/address/${walletAddress}`} target="_blank" rel="noopener" className="ml-auto">
+                  <ExternalLink className="h-3 w-3 text-sidebar-foreground/50" />
+                </a>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -133,14 +137,16 @@ const WalletPage = () => {
                     {tx.amount > 0 ? '+' : ''}{tx.amount}
                   </p>
                   {tx.tx_hash && (
-                    <p className="text-[10px] text-muted-foreground font-mono">{shortenTxHash(tx.tx_hash)}</p>
+                    <a href={`${CHAIN_CONFIG.blockExplorer}/tx/${tx.tx_hash}`} target="_blank" rel="noopener" className="text-[10px] text-muted-foreground font-mono hover:underline">
+                      {shortenTxHash(tx.tx_hash)}
+                    </a>
                   )}
                 </div>
               </CardContent>
             </Card>
           ))}
           {transactions.length === 0 && (
-            <Card className="border-dashed"><CardContent className="p-8 text-center text-sm text-muted-foreground">No transactions yet. Start earning Zlto!</CardContent></Card>
+            <Card className="border-dashed"><CardContent className="p-8 text-center text-sm text-muted-foreground">No transactions yet. Start earning Sigma!</CardContent></Card>
           )}
         </div>
       )}
@@ -163,8 +169,8 @@ const WalletPage = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-display font-bold text-zlto">{item.zlto_cost}</p>
-                    <p className="text-[10px] text-muted-foreground">ZLTO</p>
+                    <p className="font-display font-bold text-sigma">{item.zlto_cost}</p>
+                    <p className="text-[10px] text-muted-foreground">SIGMA</p>
                   </div>
                 </div>
                 <Button
@@ -174,7 +180,7 @@ const WalletPage = () => {
                   onClick={() => handleRedeem(item)}
                 >
                   {redeeming === item.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {(profile?.zlto_balance || 0) < item.zlto_cost ? 'Insufficient Zlto' : 'Redeem'}
+                  {(profile?.zlto_balance || 0) < item.zlto_cost ? 'Insufficient Sigma' : 'Redeem'}
                 </Button>
               </CardContent>
             </Card>

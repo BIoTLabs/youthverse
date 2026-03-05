@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { NIGERIAN_STATES, AFFILIATIONS } from '@/lib/constants';
-import { generateWalletFromUserId } from '@/lib/blockchain';
 
 const OnboardingModal = () => {
   const { user, profile } = useAuth();
@@ -26,7 +25,6 @@ const OnboardingModal = () => {
   });
 
   useEffect(() => {
-    // Show onboarding if profile exists but has no state set (fresh signup)
     if (profile && !profile.state && user) {
       setForm(f => ({ ...f, full_name: profile.full_name || '' }));
       setOpen(true);
@@ -45,7 +43,21 @@ const OnboardingModal = () => {
   const handleComplete = async () => {
     if (!user) return;
     setSaving(true);
-    const walletAddress = generateWalletFromUserId(user.id).address;
+
+    // Create custodial wallet via edge function
+    let walletAddress = profile?.wallet_address;
+    if (!walletAddress) {
+      try {
+        const { data, error } = await supabase.functions.invoke('create-wallet', {
+          body: { userId: user.id },
+        });
+        if (error) throw error;
+        walletAddress = data?.address || null;
+      } catch (err) {
+        console.error('Wallet creation failed:', err);
+      }
+    }
+
     const { error } = await supabase.from('profiles').update({
       full_name: form.full_name || profile?.full_name,
       phone: form.phone || null,
@@ -65,19 +77,17 @@ const OnboardingModal = () => {
   };
 
   const steps = [
-    // Step 0: Welcome
     <div key="welcome" className="flex flex-col items-center gap-4 py-4 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-hero">
         <Sparkles className="h-8 w-8 text-primary-foreground" />
       </div>
       <h3 className="font-display text-xl font-bold">Welcome to YouthWorks!</h3>
       <p className="text-sm text-muted-foreground max-w-xs">
-        Let's set up your profile so you can start earning Zlto through skills, gigs, and tree planting.
+        Let's set up your profile so you can start earning Sigma through skills, gigs, and tree planting.
       </p>
       <Button onClick={() => setStep(1)} className="w-full">Let's Go!</Button>
     </div>,
 
-    // Step 1: Basic Info
     <div key="info" className="space-y-4">
       <div className="space-y-2">
         <Label>Full Name</Label>
@@ -108,7 +118,6 @@ const OnboardingModal = () => {
       </div>
     </div>,
 
-    // Step 2: Affiliations
     <div key="affiliations" className="space-y-4">
       <div>
         <Label className="mb-2 block">Your Affiliations</Label>
@@ -145,7 +154,6 @@ const OnboardingModal = () => {
           </DialogTitle>
         </DialogHeader>
         {steps[step]}
-        {/* Progress dots */}
         <div className="flex justify-center gap-1.5 pt-2">
           {[0, 1, 2].map(i => (
             <div

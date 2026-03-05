@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Award } from 'lucide-react';
 
 const RealtimeNotifications = () => {
   const { user } = useAuth();
@@ -11,7 +10,7 @@ const RealtimeNotifications = () => {
     if (!user) return;
 
     const channel = supabase
-      .channel('zlto-notifications')
+      .channel('sigma-notifications')
       .on(
         'postgres_changes',
         {
@@ -23,7 +22,7 @@ const RealtimeNotifications = () => {
         (payload) => {
           const tx = payload.new as any;
           if (tx.amount > 0) {
-            toast.success(`+${tx.amount} ZLTO earned!`, {
+            toast.success(`+${tx.amount} SIGMA earned!`, {
               description: tx.description || 'New reward received',
               duration: 5000,
             });
@@ -37,7 +36,7 @@ const RealtimeNotifications = () => {
     };
   }, [user]);
 
-  return null; // This is a headless component
+  return null;
 };
 
 export default RealtimeNotifications;

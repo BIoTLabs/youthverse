@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TreePine, Camera, MapPin, CheckCircle, Clock, Loader2, Leaf, Award } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { simulateTransaction, createTreeHash } from '@/lib/blockchain';
+import { createTreeHash } from '@/lib/blockchain';
 import { TREE_SPECIES } from '@/lib/constants';
 
 const GreenPage = () => {
@@ -55,21 +55,10 @@ const GreenPage = () => {
     }
     setSubmitting(true);
     try {
-      // Upload photo
       const fileName = `${user.id}/${Date.now()}_${photoFile.name}`;
       const { error: upErr } = await supabase.storage.from('tree-photos').upload(fileName, photoFile);
       if (upErr) throw upErr;
       const { data: urlData } = supabase.storage.from('tree-photos').getPublicUrl(fileName);
-
-      // Simulate blockchain verification
-      const treeHash = createTreeHash(user.id, location.lat, location.lng, Date.now());
-      const txHash = await simulateTransaction('tree_planted', {
-        userId: user.id,
-        projectId: selectedProject.id,
-        treeHash,
-        lat: location.lat,
-        lng: location.lng,
-      });
 
       const { error } = await supabase.from('tree_submissions').insert({
         project_id: selectedProject.id,
@@ -78,7 +67,6 @@ const GreenPage = () => {
         latitude: location.lat,
         longitude: location.lng,
         tree_species: treeSpecies,
-        tx_hash: txHash,
       });
       if (error) throw error;
 
@@ -106,7 +94,7 @@ const GreenPage = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold">Green Pillar</h1>
-        <p className="text-sm text-muted-foreground">Plant trees, submit proof, earn Zlto, and contribute to carbon credits.</p>
+        <p className="text-sm text-muted-foreground">Plant trees, submit proof, earn Sigma, and contribute to carbon credits.</p>
       </div>
 
       {/* My Trees */}
@@ -129,7 +117,7 @@ const GreenPage = () => {
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-muted-foreground">{tree.tree_species}</span>
                       {tree.zlto_awarded > 0 && (
-                        <span className="flex items-center gap-0.5 text-xs text-zlto">
+                        <span className="flex items-center gap-0.5 text-xs text-sigma">
                           <Award className="h-3 w-3" />+{tree.zlto_awarded}
                         </span>
                       )}
@@ -167,8 +155,8 @@ const GreenPage = () => {
                         </span>
                       )}
                       <Badge variant="outline" className="text-[10px]">{project.program}</Badge>
-                      <span className="flex items-center gap-1 text-xs text-zlto">
-                        <Award className="h-3 w-3" />{project.zlto_per_tree} ZLTO/tree
+                      <span className="flex items-center gap-1 text-xs text-sigma">
+                        <Award className="h-3 w-3" />{project.zlto_per_tree} SIGMA/tree
                       </span>
                       <span className="text-xs text-muted-foreground">
                         Target: {project.target_trees} trees
@@ -238,7 +226,7 @@ const GreenPage = () => {
 
                       <Button onClick={handleSubmitTree} disabled={submitting || !photoFile || !location} className="w-full">
                         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {submitting ? 'Recording on blockchain...' : 'Submit Proof'}
+                        Submit Proof
                       </Button>
                     </div>
                   </DialogContent>

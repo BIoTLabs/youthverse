@@ -6,12 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { YouthWorksLogo } from '@/components/YouthWorksLogo';
 import { BookOpen, Briefcase, TreePine, Award, CheckCircle, Shield, ExternalLink, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { generateWalletFromUserId, shortenAddress, CHAIN_CONFIG } from '@/lib/blockchain';
+import { shortenAddress, CHAIN_CONFIG } from '@/lib/blockchain';
 
 const PublicProfilePage = () => {
   const { userId } = useParams<{ userId: string }>();
   const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState({ skills: 0, gigs: 0, trees: 0, zlto: 0 });
+  const [stats, setStats] = useState({ skills: 0, gigs: 0, trees: 0, sigma: 0 });
   const [credentials, setCredentials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,22 +21,18 @@ const PublicProfilePage = () => {
 
   const fetchProfile = async () => {
     setLoading(true);
-    // Use security definer function to get public profile data (no PII)
     const { data: profData } = await supabase.rpc('get_public_profile', { _user_id: userId! });
     
     if (profData) {
       setProfile(profData);
-      // Stats come from the public profile function
       setStats({
         skills: 0,
         gigs: 0,
         trees: 0,
-        zlto: (profData as any)?.zlto_balance || 0,
+        sigma: (profData as any)?.zlto_balance || 0,
       });
     }
     
-    // Fetch verified credentials (these are the user's own public achievements)
-    // Only authenticated users can view these via RLS
     const [skills, gigs, trees] = await Promise.all([
       supabase.from('skill_completions').select('*, courses(title, category)').eq('user_id', userId!).eq('verified', true),
       supabase.from('gig_applications').select('id', { count: 'exact', head: true }).eq('user_id', userId!).eq('status', 'verified'),
@@ -53,7 +49,7 @@ const PublicProfilePage = () => {
     setLoading(false);
   };
 
-  const walletAddress = userId ? generateWalletFromUserId(userId).address : '';
+  const walletAddress = profile?.wallet_address || '';
   const reputationScore = stats.skills * 30 + stats.gigs * 40 + stats.trees * 10;
 
   if (loading) {
@@ -76,7 +72,6 @@ const PublicProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-lg">
         <div className="container flex h-14 items-center justify-between">
           <YouthWorksLogo size="sm" />
@@ -85,7 +80,6 @@ const PublicProfilePage = () => {
       </header>
 
       <div className="container max-w-2xl py-6 space-y-6">
-        {/* Profile Hero */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="overflow-hidden border-0 gradient-hero">
             <CardContent className="p-6 text-center">
@@ -105,11 +99,12 @@ const PublicProfilePage = () => {
                 <Badge variant="outline" className="border-primary-foreground/20 text-primary-foreground/70 text-[10px] font-mono">
                   {shortenAddress(walletAddress)}
                 </Badge>
-                <a href={`${CHAIN_CONFIG.blockExplorer}/address/${walletAddress}`} target="_blank" rel="noopener">
-                  <ExternalLink className="h-3 w-3 text-primary-foreground/50" />
-                </a>
+                {walletAddress && (
+                  <a href={`${CHAIN_CONFIG.blockExplorer}/address/${walletAddress}`} target="_blank" rel="noopener">
+                    <ExternalLink className="h-3 w-3 text-primary-foreground/50" />
+                  </a>
+                )}
               </div>
-              {/* Affiliations */}
               {profile.affiliations && profile.affiliations.length > 0 && (
                 <div className="mt-3 flex flex-wrap justify-center gap-1.5">
                   {profile.affiliations.map((a: string) => (
@@ -123,14 +118,13 @@ const PublicProfilePage = () => {
           </Card>
         </motion.div>
 
-        {/* Stats */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <div className="grid grid-cols-4 gap-3">
             {[
               { icon: BookOpen, label: 'Skills', value: stats.skills, color: 'bg-primary/10 text-primary' },
               { icon: Briefcase, label: 'Gigs', value: stats.gigs, color: 'bg-accent/10 text-accent' },
               { icon: TreePine, label: 'Trees', value: stats.trees, color: 'bg-primary/10 text-primary' },
-              { icon: Award, label: 'ZLTO', value: stats.zlto, color: 'gradient-gold text-secondary-foreground' },
+              { icon: Award, label: 'SIGMA', value: stats.sigma, color: 'gradient-gold text-secondary-foreground' },
             ].map(s => (
               <Card key={s.label} className="border-border">
                 <CardContent className="p-3 text-center">
@@ -145,7 +139,6 @@ const PublicProfilePage = () => {
           </div>
         </motion.div>
 
-        {/* Reputation Score */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           <Card className="border-border">
             <CardContent className="p-4">
@@ -166,7 +159,6 @@ const PublicProfilePage = () => {
           </Card>
         </motion.div>
 
-        {/* Verified Credentials */}
         {credentials.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <h2 className="font-display text-lg font-semibold mb-3">Verified Credentials</h2>
@@ -186,7 +178,7 @@ const PublicProfilePage = () => {
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs font-medium text-zlto">+{c.zlto_awarded} ZLTO</span>
+                    <span className="text-xs font-medium text-sigma">+{c.zlto_awarded} SIGMA</span>
                   </CardContent>
                 </Card>
               ))}
@@ -194,7 +186,6 @@ const PublicProfilePage = () => {
           </motion.div>
         )}
 
-        {/* Footer */}
         <div className="text-center py-6 border-t border-border">
           <p className="text-xs text-muted-foreground">
             Verified on YouthWorks • Base Sepolia Testnet

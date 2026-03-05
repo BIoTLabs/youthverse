@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, Loader2, TreePine, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { simulateTransaction } from '@/lib/blockchain';
 
 const SurvivalChecksTab = () => {
   const { user } = useAuth();
@@ -20,7 +19,6 @@ const SurvivalChecksTab = () => {
 
   const fetchTrees = async () => {
     setLoading(true);
-    // Get verified trees that are eligible for survival checks (verified status, no recent check)
     const { data } = await supabase
       .from('tree_submissions')
       .select('*, profiles!tree_submissions_user_id_fkey(full_name), green_projects!tree_submissions_project_id_fkey(title, survival_bonus_zlto)')
@@ -50,7 +48,12 @@ const SurvivalChecksTab = () => {
       }).eq('id', tree.id);
 
       if (alive && bonus > 0) {
-        const txHash = await simulateTransaction('survival_bonus', { treeId: tree.id });
+        // Mint real tokens via edge function
+        const { data: mintData, error: mintErr } = await supabase.functions.invoke('sigma-mint', {
+          body: { userId: tree.user_id, amount: bonus, referenceId: tree.id, txType: 'tree_survival_bonus' },
+        });
+        const txHash = mintData?.txHash || null;
+
         await supabase.from('zlto_transactions').insert({
           user_id: tree.user_id,
           amount: bonus,
@@ -59,10 +62,9 @@ const SurvivalChecksTab = () => {
           tx_hash: txHash,
           description: `Survival bonus: ${tree.green_projects?.title}`,
         });
-        // Update balance
         const { data: prof } = await supabase.from('profiles').select('zlto_balance').eq('user_id', tree.user_id).single();
         await supabase.from('profiles').update({ zlto_balance: (prof?.zlto_balance || 0) + bonus }).eq('user_id', tree.user_id);
-        toast.success(`Tree alive! ${bonus} ZLTO survival bonus issued.`);
+        toast.success(`Tree alive! ${bonus} SIGMA survival bonus minted on-chain.`);
       } else if (!alive) {
         toast.info('Tree marked as dead.');
       }
@@ -84,7 +86,7 @@ const SurvivalChecksTab = () => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-display text-lg font-semibold">Survival Spot-Checks</h3>
-          <p className="text-xs text-muted-foreground">Verify verified trees are still alive. Confirm to issue survival bonus Zlto.</p>
+          <p className="text-xs text-muted-foreground">Verify verified trees are still alive. Confirm to issue survival bonus Sigma.</p>
         </div>
         <Button size="sm" variant="outline" onClick={fetchTrees}>
           <RefreshCw className="mr-1 h-3.5 w-3.5" />Refresh
@@ -118,7 +120,7 @@ const SurvivalChecksTab = () => {
                         {checkCount} prior check{checkCount !== 1 ? 's' : ''}
                       </Badge>
                       <span className="text-[10px] text-muted-foreground">
-                        Bonus: {tree.green_projects?.survival_bonus_zlto || 5} ZLTO
+                        Bonus: {tree.green_projects?.survival_bonus_zlto || 5} SIGMA
                       </span>
                     </div>
                   </div>

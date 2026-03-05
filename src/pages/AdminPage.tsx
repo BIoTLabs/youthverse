@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { simulateTransaction } from '@/lib/blockchain';
 import AdminStats from '@/components/admin/AdminStats';
 import VerificationQueue from '@/components/admin/VerificationQueue';
 import CarbonCreditsTab from '@/components/admin/CarbonCreditsTab';
@@ -44,14 +43,22 @@ const AdminPage = () => {
     setPendingGigs(pg.data || []);
   };
 
+  const mintSigma = async (userId: string, amount: number, referenceId: string, txType: string) => {
+    const { data, error } = await supabase.functions.invoke('sigma-mint', {
+      body: { userId, amount, referenceId, txType },
+    });
+    if (error) throw new Error(error.message || 'Minting failed');
+    return data?.txHash || null;
+  };
+
   const verifySkill = async (completion: any, approve: boolean) => {
     setProcessing(completion.id);
     try {
       const zlto = approve ? (completion.courses?.zlto_reward || 50) : 0;
       if (approve) {
-        const txHash = await simulateTransaction('skill_verify', { completionId: completion.id });
+        const txHash = await mintSigma(completion.user_id, zlto, completion.id, 'skill_reward');
         await supabase.from('skill_completions').update({
-          verified: true, verified_by: user?.id, zlto_awarded: zlto, verified_at: new Date().toISOString(),
+          verified: true, verified_by: user?.id, zlto_awarded: zlto, verified_at: new Date().toISOString(), tx_hash: txHash,
         }).eq('id', completion.id);
         await supabase.from('zlto_transactions').insert({
           user_id: completion.user_id, amount: zlto, tx_type: 'skill_reward',
@@ -60,7 +67,7 @@ const AdminPage = () => {
         const { data: prof } = await supabase.from('profiles').select('zlto_balance').eq('user_id', completion.user_id).single();
         await supabase.from('profiles').update({ zlto_balance: (prof?.zlto_balance || 0) + zlto }).eq('user_id', completion.user_id);
       }
-      toast.success(approve ? `Verified! ${zlto} ZLTO issued.` : 'Rejected.');
+      toast.success(approve ? `Verified! ${zlto} SIGMA minted on-chain.` : 'Rejected.');
       fetchAll();
     } catch (err: any) { toast.error(err.message); }
     finally { setProcessing(null); }
@@ -72,7 +79,7 @@ const AdminPage = () => {
       const zlto = approve ? (tree.green_projects?.zlto_per_tree || 10) : 0;
       const newStatus = approve ? 'verified' : 'rejected';
       if (approve) {
-        const txHash = await simulateTransaction('tree_verify', { treeId: tree.id });
+        const txHash = await mintSigma(tree.user_id, zlto, tree.id, 'tree_reward');
         await supabase.from('tree_submissions').update({
           status: newStatus, verified_by: user?.id, zlto_awarded: zlto, verified_at: new Date().toISOString(), tx_hash: txHash,
         }).eq('id', tree.id);
@@ -85,7 +92,7 @@ const AdminPage = () => {
       } else {
         await supabase.from('tree_submissions').update({ status: newStatus, verified_by: user?.id }).eq('id', tree.id);
       }
-      toast.success(approve ? `Tree verified! ${zlto} ZLTO issued.` : 'Tree rejected.');
+      toast.success(approve ? `Tree verified! ${zlto} SIGMA minted on-chain.` : 'Tree rejected.');
       fetchAll();
     } catch (err: any) { toast.error(err.message); }
     finally { setProcessing(null); }
@@ -96,7 +103,7 @@ const AdminPage = () => {
     try {
       const zlto = approve ? (app.gigs?.zlto_reward || 100) : 0;
       if (approve) {
-        const txHash = await simulateTransaction('gig_verify', { appId: app.id });
+        const txHash = await mintSigma(app.user_id, zlto, app.id, 'gig_reward');
         await supabase.from('gig_applications').update({
           status: 'verified', verified_by: user?.id, zlto_awarded: zlto, tx_hash: txHash,
         }).eq('id', app.id);
@@ -109,13 +116,11 @@ const AdminPage = () => {
       } else {
         await supabase.from('gig_applications').update({ status: 'disputed', verified_by: user?.id }).eq('id', app.id);
       }
-      toast.success(approve ? `Gig verified! ${zlto} ZLTO issued.` : 'Gig disputed.');
+      toast.success(approve ? `Gig verified! ${zlto} SIGMA minted on-chain.` : 'Gig disputed.');
       fetchAll();
     } catch (err: any) { toast.error(err.message); }
     finally { setProcessing(null); }
   };
-
-  const tabCount = isNationalAdmin ? 6 : 5;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -126,7 +131,7 @@ const AdminPage = () => {
         <p className="text-sm text-muted-foreground">
           {isNationalAdmin
             ? 'National overview with charts, verifications, carbon credits, and impact data.'
-            : 'Manage verifications, carbon credits, and issue Zlto rewards.'}
+            : 'Manage verifications, carbon credits, and issue Sigma rewards.'}
         </p>
       </div>
 

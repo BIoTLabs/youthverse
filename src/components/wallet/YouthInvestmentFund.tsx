@@ -41,25 +41,21 @@ const YouthInvestmentFund = () => {
     const skillCount = skills.count || 0;
     const gigCount = gigs.count || 0;
     const treeCount = trees.count || 0;
-    const zltoBalance = profile?.zlto_balance || 0;
+    const sigmaBalance = profile?.zlto_balance || 0;
     const hasProfile = !!(profile?.state && profile?.phone);
 
     const requirements = [
       { label: 'Complete 2+ verified skills', met: skillCount >= 2, detail: `${skillCount}/2 skills verified` },
       { label: 'Complete 1+ verified gig', met: gigCount >= 1, detail: `${gigCount}/1 gig completed` },
       { label: 'Plant 3+ verified trees', met: treeCount >= 3, detail: `${treeCount}/3 trees verified` },
-      { label: 'Earn 100+ ZLTO', met: zltoBalance >= 100, detail: `${zltoBalance}/100 ZLTO earned` },
+      { label: 'Earn 100+ SIGMA', met: sigmaBalance >= 100, detail: `${sigmaBalance}/100 SIGMA earned` },
       { label: 'Complete your profile', met: hasProfile, detail: hasProfile ? 'Profile complete' : 'Missing state or phone' },
     ];
 
     const metCount = requirements.filter(r => r.met).length;
     const score = Math.round((metCount / requirements.length) * 100);
 
-    setEligibility({
-      eligible: metCount === requirements.length,
-      score,
-      requirements,
-    });
+    setEligibility({ eligible: metCount === requirements.length, score, requirements });
     setLoading(false);
   };
 
@@ -69,16 +65,13 @@ const YouthInvestmentFund = () => {
       return;
     }
     setApplying(true);
-    // Simulate application submission
     await new Promise(r => setTimeout(r, 2000));
     setApplied(true);
     setApplying(false);
     toast.success('Application submitted! You will be contacted within 2 weeks.');
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
-  }
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
   return (
     <div className="space-y-4">
@@ -99,17 +92,12 @@ const YouthInvestmentFund = () => {
         </CardContent>
       </Card>
 
-      {/* Requirements */}
       <Card className="border-border">
         <CardContent className="p-4 space-y-3">
           <p className="text-sm font-semibold">Requirements</p>
           {eligibility?.requirements.map((req, i) => (
             <div key={i} className="flex items-center gap-3">
-              {req.met ? (
-                <CheckCircle className="h-4 w-4 shrink-0 text-primary" />
-              ) : (
-                <XCircle className="h-4 w-4 shrink-0 text-muted-foreground" />
-              )}
+              {req.met ? <CheckCircle className="h-4 w-4 shrink-0 text-primary" /> : <XCircle className="h-4 w-4 shrink-0 text-muted-foreground" />}
               <div className="min-w-0 flex-1">
                 <p className={`text-sm ${req.met ? 'text-foreground' : 'text-muted-foreground'}`}>{req.label}</p>
                 <p className="text-[10px] text-muted-foreground">{req.detail}</p>
@@ -120,32 +108,23 @@ const YouthInvestmentFund = () => {
         </CardContent>
       </Card>
 
-      {/* Apply Button / Status */}
       {applied ? (
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="p-4 text-center">
             <Sparkles className="mx-auto mb-2 h-8 w-8 text-primary" />
             <p className="text-sm font-semibold text-primary">Application Submitted!</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Your application is under review. You'll be contacted within 2 weeks.
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Your application is under review. You'll be contacted within 2 weeks.</p>
           </CardContent>
         </Card>
       ) : eligibility?.eligible ? (
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="w-full">
-              <Rocket className="mr-2 h-4 w-4" />Apply for Startup Capital
-            </Button>
+            <Button className="w-full"><Rocket className="mr-2 h-4 w-4" />Apply for Startup Capital</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Youth Investment Fund Application</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>Youth Investment Fund Application</DialogTitle></DialogHeader>
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Based on your verified track record, you're eligible to apply for startup capital of up to ₦500,000.
-              </p>
+              <p className="text-sm text-muted-foreground">Based on your verified track record, you're eligible to apply for startup capital of up to ₦500,000.</p>
               <div className="space-y-2">
                 <Label>Business/Project Name</Label>
                 <Input placeholder="e.g. Green AgriTech Solutions" value={form.businessName} onChange={e => setForm(f => ({ ...f, businessName: e.target.value }))} />
