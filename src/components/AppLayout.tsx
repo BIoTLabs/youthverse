@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { Home, BookOpen, Briefcase, TreePine, Wallet, Shield, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { YouthWorksLogo } from '@/components/YouthWorksLogo';
 
 const navItems = [
   { to: '/dashboard', icon: Home, label: 'Home' },
@@ -21,12 +22,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Top bar */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
         <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-hero">
-              <span className="text-sm font-bold text-primary-foreground">YW</span>
-            </div>
-            <span className="font-display text-lg font-bold text-foreground">YouthWorks</span>
-          </div>
+          <YouthWorksLogo size="sm" />
           <div className="flex items-center gap-2">
             {isAdmin && (
               <NavLink
