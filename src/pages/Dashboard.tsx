@@ -59,6 +59,7 @@ const Dashboard = () => {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+      <OnboardingModal />
       {/* Welcome hero */}
       <motion.div variants={item}>
         <Card className="overflow-hidden border-0 gradient-hero">
