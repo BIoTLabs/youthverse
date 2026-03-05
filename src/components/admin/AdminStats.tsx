@@ -11,7 +11,7 @@ const AdminStats = ({ stats }: AdminStatsProps) => {
     { icon: BookOpen, label: 'Skills Verified', value: stats.skills, color: 'bg-primary/10 text-primary' },
     { icon: Briefcase, label: 'Gigs Verified', value: stats.gigs, color: 'bg-accent/10 text-accent' },
     { icon: TreePine, label: 'Trees Verified', value: stats.trees, color: 'bg-primary/10 text-primary' },
-    { icon: Award, label: 'Zlto Issued', value: stats.zltoIssued, color: 'gradient-gold text-secondary-foreground' },
+    { icon: Award, label: 'Sigma Issued', value: stats.zltoIssued, color: 'gradient-gold text-secondary-foreground' },
   ];
 
   return (

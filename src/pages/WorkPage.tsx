@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Briefcase, MapPin, Clock, Award, Loader2, DollarSign, Users, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { simulateTransaction } from '@/lib/blockchain';
 import EmployerGigForm from '@/components/employer/EmployerGigForm';
 import EmployerGigManager from '@/components/employer/EmployerGigManager';
 
@@ -41,9 +40,6 @@ const WorkPage = () => {
     if (!user || !selectedGig) return;
     setSubmitting(true);
     try {
-      if (selectedGig.is_escrow) {
-        await simulateTransaction('escrow_deposit', { gigId: selectedGig.id, amount: selectedGig.budget });
-      }
       const { error } = await supabase.from('gig_applications').insert({
         gig_id: selectedGig.id,
         user_id: user.id,
@@ -76,7 +72,7 @@ const WorkPage = () => {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold">Work Pillar</h1>
-          <p className="text-sm text-muted-foreground">Find gigs, complete work, earn Zlto and build your on-chain work history.</p>
+          <p className="text-sm text-muted-foreground">Find gigs, complete work, earn Sigma and build your on-chain work history.</p>
         </div>
         {isEmployer && tab === 'employer' && <EmployerGigForm onCreated={fetchData} />}
       </div>
@@ -106,8 +102,8 @@ const WorkPage = () => {
                     <div className="mt-1 flex items-center gap-2">
                       <Badge className={`text-[10px] ${statusColor(app.status)}`}>{app.status}</Badge>
                       {app.zlto_awarded > 0 && (
-                        <span className="flex items-center gap-1 text-xs text-zlto">
-                          <Award className="h-3 w-3" />+{app.zlto_awarded} ZLTO
+                        <span className="flex items-center gap-1 text-xs text-sigma">
+                          <Award className="h-3 w-3" />+{app.zlto_awarded} SIGMA
                         </span>
                       )}
                     </div>
@@ -150,13 +146,12 @@ const WorkPage = () => {
                             <DollarSign className="h-3 w-3" />₦{Number(gig.budget).toLocaleString()}
                           </span>
                         )}
-                        <span className="flex items-center gap-1 text-xs text-zlto">
-                          <Award className="h-3 w-3" />{gig.zlto_reward} ZLTO
+                        <span className="flex items-center gap-1 text-xs text-sigma">
+                          <Award className="h-3 w-3" />{gig.zlto_reward} SIGMA
                         </span>
                         <Badge variant="secondary" className="text-[10px]">{gig.category}</Badge>
                       </div>
 
-                      {/* Escrow Milestones Preview */}
                       {gig.is_escrow && gig.escrow_milestones && Array.isArray(gig.escrow_milestones) && gig.escrow_milestones.length > 0 && (
                         <div className="mt-2 rounded-lg border border-border/50 p-2 space-y-1">
                           <p className="text-[10px] font-medium text-muted-foreground">Escrow Milestones:</p>
@@ -197,7 +192,7 @@ const WorkPage = () => {
                           </div>
                           <Button onClick={handleApply} disabled={submitting} className="w-full">
                             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {submitting ? (gig.is_escrow ? 'Creating escrow contract...' : 'Submitting...') : 'Submit Application'}
+                            Submit Application
                           </Button>
                         </div>
                       </DialogContent>

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Briefcase, TreePine, Wallet, TrendingUp, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { generateWalletFromUserId, shortenAddress } from '@/lib/blockchain';
+import { shortenAddress } from '@/lib/blockchain';
 import OnboardingModal from '@/components/OnboardingModal';
 
 const StatCard = ({ icon: Icon, label, value, color, to }: any) => (
@@ -29,7 +29,7 @@ const StatCard = ({ icon: Icon, label, value, color, to }: any) => (
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const [stats, setStats] = useState({ skills: 0, gigs: 0, trees: 0 });
-  const walletAddress = user ? generateWalletFromUserId(user.id).address : '';
+  const walletAddress = profile?.wallet_address || '';
 
   useEffect(() => {
     if (!user) return;
@@ -74,11 +74,13 @@ const Dashboard = () => {
                 <span className="font-display text-lg font-bold text-primary-foreground">
                   {profile?.zlto_balance || 0}
                 </span>
-                <span className="text-xs text-primary-foreground/80">ZLTO</span>
+                <span className="text-xs text-primary-foreground/80">SIGMA</span>
               </div>
-              <Badge variant="outline" className="border-primary-foreground/30 text-primary-foreground/80 text-[10px]">
-                {shortenAddress(walletAddress)}
-              </Badge>
+              {walletAddress && (
+                <Badge variant="outline" className="border-primary-foreground/30 text-primary-foreground/80 text-[10px]">
+                  {shortenAddress(walletAddress)}
+                </Badge>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -109,7 +111,7 @@ const Dashboard = () => {
         />
         <StatCard
           icon={TrendingUp}
-          label="Zlto Earned"
+          label="Sigma Earned"
           value={profile?.zlto_balance || 0}
           color="gradient-gold text-secondary-foreground"
           to="/wallet"

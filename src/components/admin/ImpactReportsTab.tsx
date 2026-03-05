@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Download, Loader2, Users, TreePine, Briefcase, Award, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const downloadCSV = (data: any[], filename: string) => {
-  if (data.length === 0) {
-    toast.error('No data to export');
-    return;
-  }
+  if (data.length === 0) { toast.error('No data to export'); return; }
   const headers = Object.keys(data[0]);
   const csv = [
     headers.join(','),
@@ -21,7 +17,6 @@ const downloadCSV = (data: any[], filename: string) => {
       return str.includes(',') || str.includes('"') || str.includes('\n') ? `"${str}"` : str;
     }).join(','))
   ].join('\n');
-
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -36,12 +31,10 @@ const ImpactReportsTab = () => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState({
     totalYouth: 0, totalSkills: 0, totalGigs: 0, totalTrees: 0,
-    totalZlto: 0, verifiedTrees: 0, aliveTrees: 0,
+    totalSigma: 0, verifiedTrees: 0, aliveTrees: 0,
   });
 
-  useEffect(() => {
-    fetchSummary();
-  }, []);
+  useEffect(() => { fetchSummary(); }, []);
 
   const fetchSummary = async () => {
     const [profiles, skills, gigs, trees, txs] = await Promise.all([
@@ -51,16 +44,11 @@ const ImpactReportsTab = () => {
       supabase.from('tree_submissions').select('status'),
       supabase.from('zlto_transactions').select('amount'),
     ]);
-
     const treeData = trees.data || [];
-    const totalZlto = (txs.data || []).reduce((s: number, t: any) => s + (t.amount > 0 ? t.amount : 0), 0);
-
+    const totalSigma = (txs.data || []).reduce((s: number, t: any) => s + (t.amount > 0 ? t.amount : 0), 0);
     setSummary({
-      totalYouth: profiles.count || 0,
-      totalSkills: skills.count || 0,
-      totalGigs: gigs.count || 0,
-      totalTrees: treeData.length,
-      totalZlto,
+      totalYouth: profiles.count || 0, totalSkills: skills.count || 0, totalGigs: gigs.count || 0,
+      totalTrees: treeData.length, totalSigma,
       verifiedTrees: treeData.filter((t: any) => t.status === 'verified').length,
       aliveTrees: treeData.filter((t: any) => t.status === 'alive').length,
     });
@@ -87,11 +75,8 @@ const ImpactReportsTab = () => {
         data = d || [];
       }
       downloadCSV(data, table);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: any) { toast.error(err.message); }
+    finally { setLoading(false); }
   };
 
   const reports = [
@@ -99,37 +84,23 @@ const ImpactReportsTab = () => {
     { icon: Award, label: 'Skill Verifications', table: 'skill_completions', count: summary.totalSkills, color: 'bg-primary/10 text-primary' },
     { icon: Briefcase, label: 'Gig Completions', table: 'gig_applications', count: summary.totalGigs, color: 'bg-accent/10 text-accent' },
     { icon: TreePine, label: 'Tree Submissions', table: 'tree_submissions', count: summary.totalTrees, color: 'bg-primary/10 text-primary' },
-    { icon: FileText, label: 'Zlto Transactions', table: 'zlto_transactions', count: summary.totalZlto, color: 'gradient-gold text-secondary-foreground' },
+    { icon: FileText, label: 'Sigma Transactions', table: 'zlto_transactions', count: summary.totalSigma, color: 'gradient-gold text-secondary-foreground' },
   ];
 
   return (
     <div className="space-y-6 mt-4">
-      {/* Impact Summary Card */}
       <Card className="overflow-hidden border-0 gradient-hero">
         <CardContent className="p-5 text-primary-foreground">
           <h3 className="font-display text-lg font-bold mb-3">Impact Summary</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div>
-              <p className="text-2xl font-bold">{summary.totalYouth}</p>
-              <p className="text-[10px] text-primary-foreground/60">Youth Enrolled</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.totalSkills}</p>
-              <p className="text-[10px] text-primary-foreground/60">Skills Verified</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.verifiedTrees + summary.aliveTrees}</p>
-              <p className="text-[10px] text-primary-foreground/60">Trees Thriving</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{summary.totalZlto}</p>
-              <p className="text-[10px] text-primary-foreground/60">ZLTO Issued</p>
-            </div>
+            <div><p className="text-2xl font-bold">{summary.totalYouth}</p><p className="text-[10px] text-primary-foreground/60">Youth Enrolled</p></div>
+            <div><p className="text-2xl font-bold">{summary.totalSkills}</p><p className="text-[10px] text-primary-foreground/60">Skills Verified</p></div>
+            <div><p className="text-2xl font-bold">{summary.verifiedTrees + summary.aliveTrees}</p><p className="text-[10px] text-primary-foreground/60">Trees Thriving</p></div>
+            <div><p className="text-2xl font-bold">{summary.totalSigma}</p><p className="text-[10px] text-primary-foreground/60">SIGMA Issued</p></div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Export Buttons */}
       <div>
         <h3 className="font-display text-lg font-semibold mb-3">Export Reports</h3>
         <div className="space-y-2">
