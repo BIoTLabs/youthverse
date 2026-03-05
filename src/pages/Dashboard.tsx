@@ -7,6 +7,8 @@ import { BookOpen, Briefcase, TreePine, Wallet, TrendingUp, ChevronRight } from 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { generateWalletFromUserId, shortenAddress } from '@/lib/blockchain';
+import OnboardingModal from '@/components/OnboardingModal';
+import { generateWalletFromUserId, shortenAddress } from '@/lib/blockchain';
 
 const StatCard = ({ icon: Icon, label, value, color, to }: any) => (
   <Link to={to}>
