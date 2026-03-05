@@ -42,7 +42,7 @@ const EmployerGigManager = () => {
     setLoading(false);
   };
 
-  const updateAppStatus = async (appId: string, gigId: string, newStatus: string) => {
+  const updateAppStatus = async (appId: string, gigId: string, newStatus: 'applied' | 'in_progress' | 'completed' | 'verified' | 'disputed' | 'open') => {
     setProcessing(appId);
     try {
       const { error } = await supabase.from('gig_applications').update({ status: newStatus }).eq('id', appId);
