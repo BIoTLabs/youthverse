@@ -15,12 +15,12 @@ export const ZLTO_ABI = [
   "event EscrowReleased(uint256 indexed gigId, address worker, uint256 amount)",
 ];
 
-// Polygon Amoy Testnet config
+// Base Sepolia Testnet config
 export const CHAIN_CONFIG = {
-  chainId: 80002,
-  chainName: 'Polygon Amoy Testnet',
-  rpcUrl: 'https://rpc-amoy.polygon.technology',
-  blockExplorer: 'https://amoy.polygonscan.com',
+  chainId: 84532,
+  chainName: 'Base Sepolia Testnet',
+  rpcUrl: 'https://sepolia.base.org',
+  blockExplorer: 'https://sepolia.basescan.org',
   // This would be the deployed contract address - placeholder for POC
   zltoContractAddress: '0x0000000000000000000000000000000000000000',
 };
