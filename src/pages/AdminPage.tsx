@@ -9,14 +9,16 @@ import AdminStats from '@/components/admin/AdminStats';
 import VerificationQueue from '@/components/admin/VerificationQueue';
 import CarbonCreditsTab from '@/components/admin/CarbonCreditsTab';
 import SurvivalChecksTab from '@/components/admin/SurvivalChecksTab';
+import NationalDashboard from '@/components/admin/NationalDashboard';
 
 const AdminPage = () => {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
   const [stats, setStats] = useState({ users: 0, trees: 0, skills: 0, gigs: 0, zltoIssued: 0 });
   const [pendingSkills, setPendingSkills] = useState<any[]>([]);
   const [pendingTrees, setPendingTrees] = useState<any[]>([]);
   const [pendingGigs, setPendingGigs] = useState<any[]>([]);
   const [processing, setProcessing] = useState<string | null>(null);
+  const isNationalAdmin = roles.includes('national_admin');
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -112,17 +114,26 @@ const AdminPage = () => {
     finally { setProcessing(null); }
   };
 
+  const tabCount = isNationalAdmin ? 6 : 5;
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Manage verifications, carbon credits, and issue Zlto rewards.</p>
+        <h1 className="font-display text-2xl font-bold">
+          {isNationalAdmin ? 'National Admin Dashboard' : 'Admin Dashboard'}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {isNationalAdmin
+            ? 'National overview with charts, verifications, carbon credits, and impact data.'
+            : 'Manage verifications, carbon credits, and issue Zlto rewards.'}
+        </p>
       </div>
 
       <AdminStats stats={stats} />
 
-      <Tabs defaultValue="skills">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue={isNationalAdmin ? 'national' : 'skills'}>
+        <TabsList className={`grid w-full ${isNationalAdmin ? 'grid-cols-6' : 'grid-cols-5'}`}>
+          {isNationalAdmin && <TabsTrigger value="national">National</TabsTrigger>}
           <TabsTrigger value="skills">Skills ({pendingSkills.length})</TabsTrigger>
           <TabsTrigger value="trees">Trees ({pendingTrees.length})</TabsTrigger>
           <TabsTrigger value="gigs">Gigs ({pendingGigs.length})</TabsTrigger>
@@ -130,6 +141,11 @@ const AdminPage = () => {
           <TabsTrigger value="carbon">Carbon</TabsTrigger>
         </TabsList>
 
+        {isNationalAdmin && (
+          <TabsContent value="national">
+            <NationalDashboard />
+          </TabsContent>
+        )}
         <TabsContent value="skills">
           <VerificationQueue type="skills" items={pendingSkills} processing={processing} onVerify={verifySkill} />
         </TabsContent>

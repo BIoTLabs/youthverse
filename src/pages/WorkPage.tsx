@@ -7,31 +7,35 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Briefcase, MapPin, Clock, Award, Loader2, DollarSign, Users } from 'lucide-react';
+import { Briefcase, MapPin, Clock, Award, Loader2, DollarSign, Users, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { simulateTransaction } from '@/lib/blockchain';
+import EmployerGigForm from '@/components/employer/EmployerGigForm';
+import EmployerGigManager from '@/components/employer/EmployerGigManager';
 
 const WorkPage = () => {
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
   const [gigs, setGigs] = useState<any[]>([]);
   const [myApps, setMyApps] = useState<any[]>([]);
   const [coverLetter, setCoverLetter] = useState('');
   const [selectedGig, setSelectedGig] = useState<any>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [tab, setTab] = useState<'browse' | 'my'>('browse');
+  const [tab, setTab] = useState<'browse' | 'my' | 'employer'>('browse');
+  const isEmployer = roles.includes('employer') || roles.includes('admin') || roles.includes('national_admin');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const [g, a] = await Promise.all([
-        supabase.from('gigs').select('*').order('created_at', { ascending: false }),
-        user ? supabase.from('gig_applications').select('*, gigs(title, budget, zlto_reward)').eq('user_id', user.id) : { data: [] },
-      ]);
-      setGigs(g.data || []);
-      setMyApps(a.data || []);
-    };
     fetchData();
   }, [user]);
+
+  const fetchData = async () => {
+    const [g, a] = await Promise.all([
+      supabase.from('gigs').select('*').order('created_at', { ascending: false }),
+      user ? supabase.from('gig_applications').select('*, gigs(title, budget, zlto_reward)').eq('user_id', user.id) : { data: [] },
+    ]);
+    setGigs(g.data || []);
+    setMyApps(a.data || []);
+  };
 
   const handleApply = async () => {
     if (!user || !selectedGig) return;
@@ -69,9 +73,12 @@ const WorkPage = () => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">Work Pillar</h1>
-        <p className="text-sm text-muted-foreground">Find gigs, complete work, earn Zlto and build your on-chain work history.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-bold">Work Pillar</h1>
+          <p className="text-sm text-muted-foreground">Find gigs, complete work, earn Zlto and build your on-chain work history.</p>
+        </div>
+        {isEmployer && tab === 'employer' && <EmployerGigForm onCreated={fetchData} />}
       </div>
 
       <div className="flex gap-2">
@@ -79,7 +86,14 @@ const WorkPage = () => {
         <Button variant={tab === 'my' ? 'default' : 'outline'} size="sm" onClick={() => setTab('my')}>
           My Applications ({myApps.length})
         </Button>
+        {isEmployer && (
+          <Button variant={tab === 'employer' ? 'default' : 'outline'} size="sm" onClick={() => setTab('employer')}>
+            My Posted Gigs
+          </Button>
+        )}
       </div>
+
+      {tab === 'employer' && isEmployer && <EmployerGigManager />}
 
       {tab === 'my' && (
         <div className="space-y-3">
@@ -141,6 +155,26 @@ const WorkPage = () => {
                         </span>
                         <Badge variant="secondary" className="text-[10px]">{gig.category}</Badge>
                       </div>
+
+                      {/* Escrow Milestones Preview */}
+                      {gig.is_escrow && gig.escrow_milestones && Array.isArray(gig.escrow_milestones) && gig.escrow_milestones.length > 0 && (
+                        <div className="mt-2 rounded-lg border border-border/50 p-2 space-y-1">
+                          <p className="text-[10px] font-medium text-muted-foreground">Escrow Milestones:</p>
+                          {(gig.escrow_milestones as any[]).map((m: any, i: number) => (
+                            <div key={i} className="flex items-center justify-between text-[10px]">
+                              <span className="flex items-center gap-1">
+                                {m.status === 'completed' ? (
+                                  <CheckCircle className="h-2.5 w-2.5 text-primary" />
+                                ) : (
+                                  <Clock className="h-2.5 w-2.5 text-muted-foreground" />
+                                )}
+                                {m.title}
+                              </span>
+                              <span className="font-medium">₦{Number(m.amount || 0).toLocaleString()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   {!applied ? (

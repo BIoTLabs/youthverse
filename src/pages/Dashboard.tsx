@@ -7,6 +7,7 @@ import { BookOpen, Briefcase, TreePine, Wallet, TrendingUp, ChevronRight } from 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { generateWalletFromUserId, shortenAddress } from '@/lib/blockchain';
+import OnboardingModal from '@/components/OnboardingModal';
 
 const StatCard = ({ icon: Icon, label, value, color, to }: any) => (
   <Link to={to}>
@@ -58,6 +59,7 @@ const Dashboard = () => {
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+      <OnboardingModal />
       {/* Welcome hero */}
       <motion.div variants={item}>
         <Card className="overflow-hidden border-0 gradient-hero">
