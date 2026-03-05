@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -351,7 +352,7 @@ const AuthPage = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password">Password</Label>
                           <Input
                             id="password"
                             type="password"
@@ -364,6 +365,23 @@ const AuthPage = () => {
                           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                           Sign In
                         </Button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!signInData.email) {
+                              toast.error('Enter your email first');
+                              return;
+                            }
+                            const { error } = await supabase.auth.resetPasswordForEmail(signInData.email, {
+                              redirectTo: `${window.location.origin}/reset-password`,
+                            });
+                            if (error) toast.error(error.message);
+                            else toast.success('Password reset link sent! Check your email.');
+                          }}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Forgot password?
+                        </button>
                       </form>
                     </TabsContent>
 
