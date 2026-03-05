@@ -18,6 +18,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import NotFound from "./pages/NotFound";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
