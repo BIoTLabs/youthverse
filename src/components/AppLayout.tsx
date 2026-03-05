@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Briefcase, TreePine, Wallet, Shield, LogOut, User } from 'lucide-react';
+import { Home, BookOpen, Briefcase, TreePine, Wallet, Shield, LogOut, User, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
 import { YouthWorksLogo } from '@/components/YouthWorksLogo';
 
@@ -15,6 +16,7 @@ const navItems = [
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, profile, roles, signOut } = useAuth();
   const location = useLocation();
+  const { theme, toggle } = useTheme();
   const isAdmin = roles.includes('admin') || roles.includes('national_admin');
 
   return (
@@ -36,6 +38,13 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 Admin
               </NavLink>
             )}
+            <button
+              onClick={toggle}
+              className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground hover:bg-muted transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+            </button>
             <NavLink
               to="/profile"
               className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted"
