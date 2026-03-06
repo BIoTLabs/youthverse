@@ -59,7 +59,7 @@ const AdminPage = () => {
     setStats({ users: users.count || 0, trees: trees.count || 0, skills: skills.count || 0, gigs: gigs.count || 0, zltoIssued: totalZlto });
 
     const [ps, pt, pg] = await Promise.all([
-      supabase.from('skill_completions').select('*, profiles!skill_completions_user_id_fkey(full_name), courses(title, zlto_reward)').eq('verified', false).neq('status' as any, 'rejected'),
+      supabase.from('skill_completions').select('*, profiles!skill_completions_user_id_fkey(full_name), courses(title, zlto_reward)').eq('verified', false).neq('status', 'rejected' as any),
       supabase.from('tree_submissions').select('*, profiles!tree_submissions_user_id_fkey(full_name), green_projects(title, zlto_per_tree)').eq('status', 'submitted'),
       supabase.from('gig_applications').select('*, profiles!gig_applications_user_id_fkey(full_name), gigs(title, zlto_reward, budget)').eq('status', 'completed'),
     ]);
