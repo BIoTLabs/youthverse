@@ -97,7 +97,7 @@ const GigManagementTab = () => {
     setSaving(false);
   };
 
-  const updateStatus = async (id: string, status: string) => {
+  const updateStatus = async (id: string, status: "open" | "applied" | "in_progress" | "completed" | "verified" | "disputed") => {
     const { error } = await supabase.from('gigs').update({ status }).eq('id', id);
     if (error) toast.error(error.message);
     else { toast.success(`Status updated to ${status}`); fetchGigs(); }
