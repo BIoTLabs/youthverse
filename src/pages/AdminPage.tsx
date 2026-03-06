@@ -2,14 +2,20 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { Rocket, Loader2 } from 'lucide-react';
 import AdminStats from '@/components/admin/AdminStats';
 import VerificationQueue from '@/components/admin/VerificationQueue';
 import CarbonCreditsTab from '@/components/admin/CarbonCreditsTab';
 import SurvivalChecksTab from '@/components/admin/SurvivalChecksTab';
 import NationalDashboard from '@/components/admin/NationalDashboard';
 import ImpactReportsTab from '@/components/admin/ImpactReportsTab';
+import UserManagementTab from '@/components/admin/UserManagementTab';
+import CourseManagementTab from '@/components/admin/CourseManagementTab';
+import GreenProjectsTab from '@/components/admin/GreenProjectsTab';
+import MarketplaceTab from '@/components/admin/MarketplaceTab';
 
 const AdminPage = () => {
   const { user, roles } = useAuth();
@@ -18,9 +24,27 @@ const AdminPage = () => {
   const [pendingTrees, setPendingTrees] = useState<any[]>([]);
   const [pendingGigs, setPendingGigs] = useState<any[]>([]);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [deploying, setDeploying] = useState(false);
+  const [contractAddress, setContractAddress] = useState<string | null>(null);
   const isNationalAdmin = roles.includes('national_admin');
 
-  useEffect(() => { fetchAll(); }, []);
+  useEffect(() => { fetchAll(); fetchContract(); }, []);
+
+  const fetchContract = async () => {
+    const { data } = await supabase.from('platform_config').select('value').eq('key', 'sigma_contract_address').single();
+    if (data) setContractAddress(data.value);
+  };
+
+  const deployContract = async () => {
+    setDeploying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('deploy-sigma-token');
+      if (error) throw new Error(error.message);
+      setContractAddress(data?.contractAddress || null);
+      toast.success('Sigma token contract deployed!');
+    } catch (err: any) { toast.error(err.message); }
+    finally { setDeploying(false); }
+  };
 
   const fetchAll = async () => {
     const [users, trees, skills, gigs, txs] = await Promise.all([
@@ -124,29 +148,49 @@ const AdminPage = () => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold">
-          {isNationalAdmin ? 'National Admin Dashboard' : 'Admin Dashboard'}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {isNationalAdmin
-            ? 'National overview with charts, verifications, carbon credits, and impact data.'
-            : 'Manage verifications, carbon credits, and issue Sigma rewards.'}
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="font-display text-2xl font-bold">
+            {isNationalAdmin ? 'National Admin Dashboard' : 'Admin Dashboard'}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {isNationalAdmin
+              ? 'National overview with charts, verifications, carbon credits, and impact data.'
+              : 'Manage verifications, carbon credits, and issue Sigma rewards.'}
+          </p>
+        </div>
+        {isNationalAdmin && (
+          <div className="text-right">
+            {contractAddress ? (
+              <p className="text-xs text-muted-foreground">Contract: <span className="font-mono text-[10px]">{contractAddress.slice(0, 6)}...{contractAddress.slice(-4)}</span></p>
+            ) : (
+              <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={deployContract} disabled={deploying}>
+                {deploying ? <Loader2 className="h-3 w-3 animate-spin" /> : <Rocket className="h-3 w-3" />}
+                Deploy Sigma Contract
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       <AdminStats stats={stats} />
 
       <Tabs defaultValue={isNationalAdmin ? 'national' : 'skills'}>
-        <TabsList className={`grid w-full ${isNationalAdmin ? 'grid-cols-7' : 'grid-cols-6'}`}>
-          {isNationalAdmin && <TabsTrigger value="national">National</TabsTrigger>}
-          <TabsTrigger value="skills">Skills ({pendingSkills.length})</TabsTrigger>
-          <TabsTrigger value="trees">Trees ({pendingTrees.length})</TabsTrigger>
-          <TabsTrigger value="gigs">Gigs ({pendingGigs.length})</TabsTrigger>
-          <TabsTrigger value="survival">Survival</TabsTrigger>
-          <TabsTrigger value="carbon">Carbon</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full">
+            {isNationalAdmin && <TabsTrigger value="national">National</TabsTrigger>}
+            <TabsTrigger value="skills">Skills ({pendingSkills.length})</TabsTrigger>
+            <TabsTrigger value="trees">Trees ({pendingTrees.length})</TabsTrigger>
+            <TabsTrigger value="gigs">Gigs ({pendingGigs.length})</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+            <TabsTrigger value="survival">Survival</TabsTrigger>
+            <TabsTrigger value="carbon">Carbon</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
+        </div>
 
         {isNationalAdmin && (
           <TabsContent value="national">
@@ -161,6 +205,18 @@ const AdminPage = () => {
         </TabsContent>
         <TabsContent value="gigs">
           <VerificationQueue type="gigs" items={pendingGigs} processing={processing} onVerify={verifyGig} />
+        </TabsContent>
+        <TabsContent value="users">
+          <UserManagementTab />
+        </TabsContent>
+        <TabsContent value="courses">
+          <CourseManagementTab />
+        </TabsContent>
+        <TabsContent value="projects">
+          <GreenProjectsTab />
+        </TabsContent>
+        <TabsContent value="marketplace">
+          <MarketplaceTab />
         </TabsContent>
         <TabsContent value="survival">
           <SurvivalChecksTab />
