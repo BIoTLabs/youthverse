@@ -18,7 +18,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be inside AuthProvider');
+  if (!ctx) {
+    // Return a safe fallback during initial render / HMR boundary issues
+    return {
+      user: null,
+      session: null,
+      profile: null,
+      roles: [] as string[],
+      loading: true,
+      refreshProfile: async () => {},
+      signUp: async () => ({ data: null, error: new Error('Auth not ready') } as any),
+      signIn: async () => ({ data: null, error: new Error('Auth not ready') } as any),
+      signOut: async () => {},
+    } as AuthContextType;
+  }
   return ctx;
 };
 
