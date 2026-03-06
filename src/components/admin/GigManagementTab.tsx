@@ -12,7 +12,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Plus, Pencil, Loader2, Briefcase } from 'lucide-react';
+import { Plus, Pencil, Loader2, Briefcase, Users, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+
+const PAGE_SIZE = 15;
 
 const emptyGig = {
   title: '', description: '', category: '', location: '', state: '',
@@ -29,6 +31,8 @@ const statusColors: Record<string, string> = {
   disputed: 'bg-destructive/10 text-destructive',
 };
 
+type GigStatus = "open" | "applied" | "in_progress" | "completed" | "verified" | "disputed";
+
 const GigManagementTab = () => {
   const { user } = useAuth();
   const [gigs, setGigs] = useState<any[]>([]);
@@ -38,6 +42,13 @@ const GigManagementTab = () => {
   const [form, setForm] = useState(emptyGig);
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [page, setPage] = useState(0);
+
+  // Applicants viewer
+  const [viewingGig, setViewingGig] = useState<any | null>(null);
+  const [applicants, setApplicants] = useState<any[]>([]);
+  const [loadingApps, setLoadingApps] = useState(false);
+  const [processingApp, setProcessingApp] = useState<string | null>(null);
 
   useEffect(() => { fetchGigs(); }, []);
 
@@ -97,13 +108,40 @@ const GigManagementTab = () => {
     setSaving(false);
   };
 
-  const updateStatus = async (id: string, status: "open" | "applied" | "in_progress" | "completed" | "verified" | "disputed") => {
+  const updateStatus = async (id: string, status: GigStatus) => {
     const { error } = await supabase.from('gigs').update({ status }).eq('id', id);
     if (error) toast.error(error.message);
     else { toast.success(`Status updated to ${status}`); fetchGigs(); }
   };
 
+  // Applicants
+  const viewApplicants = async (gig: any) => {
+    setViewingGig(gig);
+    setLoadingApps(true);
+    const { data } = await supabase
+      .from('gig_applications')
+      .select('*, profiles!gig_applications_user_id_fkey(full_name, email, state)')
+      .eq('gig_id', gig.id)
+      .order('created_at', { ascending: false });
+    setApplicants(data || []);
+    setLoadingApps(false);
+  };
+
+  const updateAppStatus = async (appId: string, newStatus: GigStatus) => {
+    setProcessingApp(appId);
+    const { error } = await supabase.from('gig_applications').update({ status: newStatus }).eq('id', appId);
+    if (error) toast.error(error.message);
+    else { toast.success(`Application ${newStatus}`); if (viewingGig) viewApplicants(viewingGig); }
+    setProcessingApp(null);
+  };
+
   const filtered = filter === 'all' ? gigs : gigs.filter(g => g.status === filter);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const paginated = filtered.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+  // Reset page when filter changes
+  useEffect(() => { setPage(0); }, [filter]);
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
 
@@ -147,7 +185,7 @@ const GigManagementTab = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map(gig => (
+            {paginated.map(gig => (
               <TableRow key={gig.id}>
                 <TableCell className="font-medium text-xs max-w-[160px] truncate">{gig.title}</TableCell>
                 <TableCell className="text-xs">{gig.profiles?.full_name || '—'}</TableCell>
@@ -162,7 +200,10 @@ const GigManagementTab = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => openEdit(gig)}>
+                    <Button size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => viewApplicants(gig)} title="View applicants">
+                      <Users className="h-3 w-3" />
+                    </Button>
+                    <Button size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => openEdit(gig)} title="Edit gig">
                       <Pencil className="h-3 w-3" />
                     </Button>
                     {gig.status === 'open' && (
@@ -174,15 +215,33 @@ const GigManagementTab = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {filtered.length === 0 && (
+            {paginated.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No gigs found.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-border px-4 py-2">
+            <p className="text-xs text-muted-foreground">
+              Page {currentPage + 1} of {totalPages}
+            </p>
+            <div className="flex gap-1">
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0" disabled={currentPage === 0} onClick={() => setPage(p => p - 1)}>
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 w-7 p-0" disabled={currentPage >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
       </CardContent>
 
+      {/* Create/Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>{editId ? 'Edit Gig' : 'Create Gig'}</DialogTitle></DialogHeader>
@@ -210,6 +269,67 @@ const GigManagementTab = () => {
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : editId ? 'Update Gig' : 'Create Gig'}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Applicants Viewer Dialog */}
+      <Dialog open={!!viewingGig} onOpenChange={v => { if (!v) setViewingGig(null); }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4" />
+              Applicants — {viewingGig?.title}
+            </DialogTitle>
+          </DialogHeader>
+
+          {loadingApps ? (
+            <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
+          ) : applicants.length === 0 ? (
+            <p className="text-center text-sm text-muted-foreground py-8">No applications yet for this gig.</p>
+          ) : (
+            <div className="space-y-2">
+              {applicants.map(app => (
+                <div key={app.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{app.profiles?.full_name || 'Unknown'}</p>
+                    <p className="text-xs text-muted-foreground">{app.profiles?.email} {app.profiles?.state ? `• ${app.profiles.state}` : ''}</p>
+                    {app.cover_letter && (
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{app.cover_letter}</p>
+                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge className={`text-[10px] ${statusColors[app.status] || ''}`}>{app.status}</Badge>
+                      <span className="text-[10px] text-muted-foreground">
+                        {new Date(app.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 ml-3 shrink-0">
+                    {app.status === 'applied' && (
+                      <>
+                        <Button size="sm" variant="default" className="h-7 text-xs" disabled={processingApp === app.id} onClick={() => updateAppStatus(app.id, 'in_progress')}>
+                          {processingApp === app.id ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Accept'}
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive" disabled={processingApp === app.id} onClick={() => updateAppStatus(app.id, 'disputed')}>
+                          Reject
+                        </Button>
+                      </>
+                    )}
+                    {app.status === 'in_progress' && (
+                      <Button size="sm" className="h-7 text-xs" disabled={processingApp === app.id} onClick={() => updateAppStatus(app.id, 'completed')}>
+                        {processingApp === app.id ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Mark Complete'}
+                      </Button>
+                    )}
+                    {app.status === 'completed' && (
+                      <Badge variant="outline" className="text-[10px]">Awaiting Verification</Badge>
+                    )}
+                    {app.status === 'verified' && (
+                      <Badge className="text-[10px] bg-primary text-primary-foreground">Verified ✓</Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </Card>
