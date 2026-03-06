@@ -166,7 +166,7 @@ const GigManagementTab = () => {
                       <Pencil className="h-3 w-3" />
                     </Button>
                     {gig.status === 'open' && (
-                      <Button size="sm" variant="ghost" className="h-7 text-[10px] px-2 text-destructive" onClick={() => updateStatus(gig.id, 'disputed' as any)}>
+                      <Button size="sm" variant="ghost" className="h-7 text-[10px] px-2 text-destructive" onClick={() => updateStatus(gig.id, 'disputed')}>
                         Close
                       </Button>
                     )}
