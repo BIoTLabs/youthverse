@@ -28,14 +28,14 @@ const fadeUp = {
 const stats = [
   { label: 'Youth Enrolled', value: '12,400+', icon: Users, accent: 'text-primary' },
   { label: 'Trees Planted', value: '48,000+', icon: TreePine, accent: 'text-primary' },
-  { label: 'Zlto Earned', value: '₦2.1M+', icon: Coins, accent: 'text-secondary' },
+  { label: 'Sigma Earned', value: '₦2.1M+', icon: Coins, accent: 'text-secondary' },
 ];
 
 const pillars = [
   {
     icon: BookOpen,
     title: 'Skills Development',
-    description: 'Complete verified courses from NiYA Academy and local partners. Earn blockchain-verified credentials and Zlto tokens.',
+    description: 'Complete verified courses from NiYA Academy and local partners. Earn blockchain-verified credentials and Sigma tokens.',
     gradient: 'from-primary/10 to-primary/5',
     iconBg: 'bg-primary/15',
     iconColor: 'text-primary',
@@ -51,7 +51,7 @@ const pillars = [
   {
     icon: TreePine,
     title: 'Green Impact',
-    description: 'Plant and monitor trees across Nigeria. Submit geo-tagged proof, earn Zlto per tree, unlock survival bonuses.',
+    description: 'Plant and monitor trees across Nigeria. Submit geo-tagged proof, earn Sigma per tree, unlock survival bonuses.',
     gradient: 'from-primary/10 to-primary/5',
     iconBg: 'bg-primary/15',
     iconColor: 'text-primary',
@@ -63,7 +63,7 @@ const steps = [
   { step: '02', title: 'Build Skills', description: 'Complete courses and earn verified credentials on-chain.' },
   { step: '03', title: 'Find Work', description: 'Apply for escrow-protected gigs with guaranteed pay.' },
   { step: '04', title: 'Plant Trees', description: 'Join green projects with geo-tagged proof of planting.' },
-  { step: '05', title: 'Earn & Redeem', description: 'Accumulate Zlto and redeem for airtime, data, and more.' },
+  { step: '05', title: 'Earn & Redeem', description: 'Accumulate Sigma and redeem for airtime, data, and more.' },
 ];
 
 const partners = [
@@ -76,7 +76,7 @@ const partners = [
 const features = [
   { icon: Shield, title: 'Smart Contract Escrow', desc: 'All payments on-chain protected via Base.' },
   { icon: Globe, title: '36 States + FCT', desc: 'Active projects across all Nigerian states.' },
-  { icon: Zap, title: 'Instant Rewards', desc: 'Zlto credited immediately upon verification.' },
+  { icon: Zap, title: 'Instant Rewards', desc: 'Sigma credited immediately upon verification.' },
   { icon: CheckCircle2, title: 'Verified Credentials', desc: 'Blockchain-stamped certificates employers trust.' },
 ];
 
@@ -157,7 +157,7 @@ const AuthPage = () => {
               <br />
               Reputation.{' '}
               <span className="text-electric bg-gradient-to-r from-primary to-electric-glow bg-clip-text text-transparent">
-                Earn Zlto.
+                Earn Sigma.
               </span>
             </motion.h1>
 
@@ -167,7 +167,7 @@ const AuthPage = () => {
               className="mx-auto mt-6 max-w-2xl text-lg text-white/55 sm:text-xl"
             >
               Nigeria's platform connecting youth to skills, work opportunities,
-              and climate action — all rewarded with Zlto tokens on-chain.
+              and climate action — all rewarded with Sigma tokens on-chain.
             </motion.p>
 
             <motion.div variants={fadeUp} custom={3} className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
