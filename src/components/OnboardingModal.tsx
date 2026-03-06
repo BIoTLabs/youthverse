@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { NIGERIAN_STATES, AFFILIATIONS } from '@/lib/constants';
 
 const OnboardingModal = () => {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -70,6 +70,7 @@ const OnboardingModal = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      await refreshProfile();
       toast.success('Welcome to YouthWorks! 🎉');
       setOpen(false);
     }
@@ -83,7 +84,7 @@ const OnboardingModal = () => {
       </div>
       <h3 className="font-display text-xl font-bold">Welcome to YouthWorks!</h3>
       <p className="text-sm text-muted-foreground max-w-xs">
-        Let's set up your profile so you can start earning Sigma through skills, gigs, and tree planting.
+        Let's set up your profile so you can start earning SIGMA through skills, gigs, and tree planting.
       </p>
       <Button onClick={() => setStep(1)} className="w-full">Let's Go!</Button>
     </div>,
