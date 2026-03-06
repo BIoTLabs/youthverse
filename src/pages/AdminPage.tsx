@@ -16,6 +16,7 @@ import UserManagementTab from '@/components/admin/UserManagementTab';
 import CourseManagementTab from '@/components/admin/CourseManagementTab';
 import GreenProjectsTab from '@/components/admin/GreenProjectsTab';
 import MarketplaceTab from '@/components/admin/MarketplaceTab';
+import GigManagementTab from '@/components/admin/GigManagementTab';
 
 const AdminPage = () => {
   const { user, roles } = useAuth();
@@ -186,6 +187,7 @@ const AdminPage = () => {
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+            <TabsTrigger value="manage-gigs">Manage Gigs</TabsTrigger>
             <TabsTrigger value="survival">Survival</TabsTrigger>
             <TabsTrigger value="carbon">Carbon</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -217,6 +219,9 @@ const AdminPage = () => {
         </TabsContent>
         <TabsContent value="marketplace">
           <MarketplaceTab />
+        </TabsContent>
+        <TabsContent value="manage-gigs">
+          <GigManagementTab />
         </TabsContent>
         <TabsContent value="survival">
           <SurvivalChecksTab />
