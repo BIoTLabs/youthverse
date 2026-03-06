@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 
-const emptyCourse = { title: '', description: '', category: '', provider: 'NiYA Academy', duration_hours: '', zlto_reward: '50', completion_code: '' };
+const emptyCourse = { title: '', description: '', category: '', provider: 'NiYA Academy', duration_hours: '', zlto_reward: '50', completion_code: '', url: '' };
 
 const CourseManagementTab = () => {
   const [courses, setCourses] = useState<any[]>([]);
@@ -32,7 +32,7 @@ const CourseManagementTab = () => {
   const openNew = () => { setEditId(null); setForm(emptyCourse); setOpen(true); };
   const openEdit = (c: any) => {
     setEditId(c.id);
-    setForm({ title: c.title, description: c.description || '', category: c.category || '', provider: c.provider || '', duration_hours: c.duration_hours?.toString() || '', zlto_reward: c.zlto_reward?.toString() || '50', completion_code: c.completion_code || '' });
+    setForm({ title: c.title, description: c.description || '', category: c.category || '', provider: c.provider || '', duration_hours: c.duration_hours?.toString() || '', zlto_reward: c.zlto_reward?.toString() || '50', completion_code: c.completion_code || '', url: (c as any).url || '' });
     setOpen(true);
   };
 
@@ -43,6 +43,7 @@ const CourseManagementTab = () => {
       title: form.title, description: form.description || null, category: form.category || null,
       provider: form.provider || null, duration_hours: form.duration_hours ? parseInt(form.duration_hours) : null,
       zlto_reward: form.zlto_reward ? parseFloat(form.zlto_reward) : 50, completion_code: form.completion_code || null,
+      url: form.url || null,
     };
     const { error } = editId
       ? await supabase.from('courses').update(payload).eq('id', editId)
@@ -112,6 +113,7 @@ const CourseManagementTab = () => {
               <div><Label>Category</Label><Input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} /></div>
               <div><Label>Provider</Label><Input value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} /></div>
             </div>
+            <div><Label>Course URL</Label><Input placeholder="https://..." value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} /></div>
             <div className="grid grid-cols-3 gap-3">
               <div><Label>Duration (hrs)</Label><Input type="number" value={form.duration_hours} onChange={e => setForm(f => ({ ...f, duration_hours: e.target.value }))} /></div>
               <div><Label>Sigma Reward</Label><Input type="number" value={form.zlto_reward} onChange={e => setForm(f => ({ ...f, zlto_reward: e.target.value }))} /></div>

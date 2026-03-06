@@ -72,6 +72,7 @@ export type Database = {
           id: string
           provider: string | null
           title: string
+          url: string | null
           zlto_reward: number | null
         }
         Insert: {
@@ -83,6 +84,7 @@ export type Database = {
           id?: string
           provider?: string | null
           title: string
+          url?: string | null
           zlto_reward?: number | null
         }
         Update: {
@@ -94,6 +96,7 @@ export type Database = {
           id?: string
           provider?: string | null
           title?: string
+          url?: string | null
           zlto_reward?: number | null
         }
         Relationships: []
@@ -431,7 +434,9 @@ export type Database = {
           completion_code: string | null
           course_id: string
           created_at: string | null
+          credential_hash: string | null
           id: string
+          status: string
           tx_hash: string | null
           user_id: string
           verified: boolean | null
@@ -443,7 +448,9 @@ export type Database = {
           completion_code?: string | null
           course_id: string
           created_at?: string | null
+          credential_hash?: string | null
           id?: string
+          status?: string
           tx_hash?: string | null
           user_id: string
           verified?: boolean | null
@@ -455,7 +462,9 @@ export type Database = {
           completion_code?: string | null
           course_id?: string
           created_at?: string | null
+          credential_hash?: string | null
           id?: string
+          status?: string
           tx_hash?: string | null
           user_id?: string
           verified?: boolean | null

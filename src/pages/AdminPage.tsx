@@ -59,7 +59,7 @@ const AdminPage = () => {
     setStats({ users: users.count || 0, trees: trees.count || 0, skills: skills.count || 0, gigs: gigs.count || 0, zltoIssued: totalZlto });
 
     const [ps, pt, pg] = await Promise.all([
-      supabase.from('skill_completions').select('*, profiles!skill_completions_user_id_fkey(full_name), courses(title, zlto_reward)').eq('verified', false),
+      supabase.from('skill_completions').select('*, profiles!skill_completions_user_id_fkey(full_name), courses(title, zlto_reward)').eq('verified', false).neq('status', 'rejected' as any),
       supabase.from('tree_submissions').select('*, profiles!tree_submissions_user_id_fkey(full_name), green_projects(title, zlto_per_tree)').eq('status', 'submitted'),
       supabase.from('gig_applications').select('*, profiles!gig_applications_user_id_fkey(full_name), gigs(title, zlto_reward, budget)').eq('status', 'completed'),
     ]);
@@ -83,14 +83,16 @@ const AdminPage = () => {
       if (approve) {
         const txHash = await mintSigma(completion.user_id, zlto, completion.id, 'skill_reward');
         await supabase.from('skill_completions').update({
-          verified: true, verified_by: user?.id, zlto_awarded: zlto, verified_at: new Date().toISOString(), tx_hash: txHash,
-        }).eq('id', completion.id);
+          verified: true, verified_by: user?.id, zlto_awarded: zlto, verified_at: new Date().toISOString(), tx_hash: txHash, status: 'verified',
+        } as any).eq('id', completion.id);
         await supabase.from('zlto_transactions').insert({
           user_id: completion.user_id, amount: zlto, tx_type: 'skill_reward',
           reference_id: completion.id, tx_hash: txHash, description: `Skill: ${completion.courses?.title}`,
         });
         const { data: prof } = await supabase.from('profiles').select('zlto_balance').eq('user_id', completion.user_id).single();
         await supabase.from('profiles').update({ zlto_balance: (prof?.zlto_balance || 0) + zlto }).eq('user_id', completion.user_id);
+      } else {
+        await supabase.from('skill_completions').update({ status: 'rejected', verified_by: user?.id } as any).eq('id', completion.id);
       }
       toast.success(approve ? `Verified! ${zlto} SIGMA minted on-chain.` : 'Rejected.');
       fetchAll();
