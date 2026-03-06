@@ -137,7 +137,7 @@ const EmployerGigForm = ({ onCreated }: EmployerGigFormProps) => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Zlto Reward</Label>
+              <Label>Sigma Reward</Label>
               <Input type="number" value={form.zlto_reward} onChange={e => updateField('zlto_reward', e.target.value)} />
             </div>
             <div className="space-y-2">
