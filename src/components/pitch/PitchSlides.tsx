@@ -312,9 +312,9 @@ export const PilotSlide = () => {
 // Slide 8: Ask & Impact
 export const AskSlide = () => {
   const metrics = [
-    { value: '5,000', label: 'Youth Onboarded' },
-    { value: '10,000+', label: 'Sigma Transactions' },
-    { value: '5,000', label: 'Trees Planted' },
+    { value: '10,000', label: 'Youth Onboarded' },
+    { value: '25,000+', label: 'Sigma Transactions' },
+    { value: '10,000', label: 'Trees Planted' },
     { value: '60%+', label: 'User Retention' },
   ];
   return (
