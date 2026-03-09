@@ -327,7 +327,7 @@ export const AskSlide = () => {
         </motion.h2>
         <motion.div initial="hidden" animate="visible" custom={0.5} variants={fadeUp}
           className="px-[48px] py-[24px] rounded-[20px] bg-[hsl(42,90%,54%,0.1)] border border-[hsl(42,90%,54%,0.3)]">
-          <span className="text-[36px] font-display font-bold text-[hsl(42,90%,54%)]">$100,000 USD</span>
+          <span className="text-[36px] font-display font-bold text-[hsl(42,90%,54%)]">$85,000 USD</span>
           <span className="text-[24px] text-[hsl(210,10%,55%)] ml-[16px]">Seed Funding</span>
         </motion.div>
         <motion.p initial="hidden" animate="visible" custom={1} variants={fadeUp}
