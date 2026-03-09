@@ -271,15 +271,15 @@ export const PilotSlide = () => {
   const phases = [
     {
       phase: 'Phase 1', months: 'Months 1-3', color: 'hsl(210,55%,55%)',
-      items: ['Deploy Sigma token on Base Sepolia', 'Onboard 500 youth users', 'Launch 10 accredited courses', 'Auto-provision custodial wallets'],
+      items: ['Deploy Sigma token on Base Sepolia', 'Onboard 2,500 youth across Lagos, Ogun & Ondo', 'Launch 10 accredited courses', 'Auto-provision custodial wallets'],
     },
     {
       phase: 'Phase 2', months: 'Months 4-8', color: 'hsl(145,80%,48%)',
-      items: ['50 employer partners with escrow gigs', 'GPS-verified tree planting in 3 communities', '2,000 active users • 5,000 trees', 'Migrate to Base mainnet'],
+      items: ['100 employer partners with escrow gigs', 'GPS-verified tree planting in 6 communities', '5,000 active users • 10,000 trees', 'Migrate to Base mainnet'],
     },
     {
       phase: 'Phase 3', months: 'Months 9-12', color: 'hsl(42,90%,54%)',
-      items: ['Tokenized carbon credit batches', 'Marketplace: airtime & data bundles', 'National Dashboard for impact', '5,000 users • First carbon credit sale'],
+      items: ['Tokenized carbon credit batches', 'Marketplace: airtime & data bundles', 'National Dashboard for impact', '10,000 users • First carbon credit sale'],
     },
   ];
   return (
