@@ -1,73 +1,127 @@
-# Welcome to your Lovable project
+# YouthWorks
 
-## Project info
+**Empowering African youth through verified skills, dignified work, and climate action — powered by blockchain.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+YouthWorks is a digital platform designed to address youth unemployment and climate resilience across Africa. It provides young people with a pathway to build verified, portable reputations through skills development, gig-based work, and environmental stewardship — all recorded on-chain via Sigma tokens.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🎯 Mission
 
-**Use Lovable**
+To create an inclusive digital economy where young people can earn, learn, and contribute to climate action — with every achievement verifiably recorded on the blockchain.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Aligned with **UNICEF's Generation Unlimited** initiative and the **UN Sustainable Development Goals** (SDGs 4, 8, 13).
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🏗 Core Pillars
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+| Pillar | Description |
+|--------|-------------|
+| **Skills** | Youth complete accredited courses and receive blockchain-verified credentials with Sigma token rewards |
+| **Work** | Employers post gigs with escrow-backed payments; youth apply, complete, and get verified |
+| **Green** | Tree-planting projects with GPS-verified submissions, survival checks, and carbon credit integration |
+| **Wallet** | Custodial blockchain wallet for earning, spending, and redeeming Sigma tokens in the marketplace |
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🛠 Tech Stack
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
+| UI Components | shadcn/ui, Radix UI, Framer Motion |
+| Backend | Supabase (PostgreSQL, Auth, Edge Functions, Storage) |
+| Blockchain | Ethereum-compatible (ethers.js), Sigma Token (ERC-20) |
+| Data Visualization | Recharts |
+| PWA | vite-plugin-pwa with offline support |
+
+---
+
+## ✨ Key Features
+
+- **Blockchain-verified credentials** — Every skill completion and work verification is hashed and recorded on-chain
+- **Custodial wallets** — Automatic wallet creation for youth with no crypto experience required
+- **Escrow-backed gigs** — Milestone-based payments with on-chain escrow for employer trust
+- **Tree planting & survival tracking** — GPS-tagged submissions with admin verification and survival bonuses
+- **Carbon credit batches** — Aggregated environmental impact converted to tradeable carbon credits
+- **Marketplace** — Redeem Sigma tokens for airtime, data bundles, and partner rewards
+- **Role-based access** — Youth, Employer, Partner, Admin, and National Admin roles with RLS-enforced security
+- **National dashboard** — State-level analytics for program administrators and policy makers
+- **PWA support** — Installable on mobile devices for offline-first access
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18+ (recommended: use [nvm](https://github.com/nvm-sh/nvm))
+- npm or bun
+
+### Installation
+
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Navigate to the project directory
+cd youthworks
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📁 Project Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+├── src/
+│   ├── components/       # Reusable UI components
+│   │   ├── admin/        # Admin dashboard tabs
+│   │   ├── employer/     # Employer gig management
+│   │   ├── ui/           # shadcn/ui primitives
+│   │   └── wallet/       # Wallet & investment components
+│   ├── contexts/         # React context providers (Auth)
+│   ├── hooks/            # Custom React hooks
+│   ├── integrations/     # Backend client & types
+│   ├── lib/              # Utilities, blockchain helpers, constants
+│   └── pages/            # Route-level page components
+├── supabase/
+│   ├── functions/        # Edge functions (wallet, token minting)
+│   └── migrations/       # Database schema migrations
+└── public/               # Static assets & PWA icons
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🔐 Security
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Row-Level Security (RLS)** enforced on all database tables
+- **Role-based access control** via `user_roles` table with `has_role()` security definer function
+- **Custodial wallet encryption** for private key storage
+- **Edge functions** for sensitive blockchain operations (minting, deployment)
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 🌍 Deployment
 
-## Can I connect a custom domain to my Lovable project?
+The application frontend is deployed as a static site. Backend services (database, authentication, edge functions) are managed via the cloud platform and deploy automatically.
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📄 License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is developed as part of a youth empowerment initiative. All rights reserved.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
