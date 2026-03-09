@@ -39,7 +39,7 @@ export const TitleSlide = () => (
         className="flex items-center gap-[16px] mt-[24px]"
       >
         <span className="px-[24px] py-[12px] rounded-full border border-[hsl(145,80%,42%,0.3)] text-[20px] text-[hsl(145,80%,48%)] font-semibold">
-          🇳🇬 Lagos, Nigeria
+          🇳🇬 Lagos, Ogun & Ondo, Nigeria
         </span>
         <span className="px-[24px] py-[12px] rounded-full border border-[hsl(42,90%,54%,0.3)] text-[20px] text-[hsl(42,90%,54%)] font-semibold">
           Base L2 • ERC-20
@@ -271,15 +271,15 @@ export const PilotSlide = () => {
   const phases = [
     {
       phase: 'Phase 1', months: 'Months 1-3', color: 'hsl(210,55%,55%)',
-      items: ['Deploy Sigma token on Base Sepolia', 'Onboard 500 youth users', 'Launch 10 accredited courses', 'Auto-provision custodial wallets'],
+      items: ['Deploy Sigma token on Base Sepolia', 'Onboard 2,500 youth across Lagos, Ogun & Ondo', 'Launch 10 accredited courses', 'Auto-provision custodial wallets'],
     },
     {
       phase: 'Phase 2', months: 'Months 4-8', color: 'hsl(145,80%,48%)',
-      items: ['50 employer partners with escrow gigs', 'GPS-verified tree planting in 3 communities', '2,000 active users • 5,000 trees', 'Migrate to Base mainnet'],
+      items: ['100 employer partners with escrow gigs', 'GPS-verified tree planting in 6 communities', '5,000 active users • 10,000 trees', 'Migrate to Base mainnet'],
     },
     {
       phase: 'Phase 3', months: 'Months 9-12', color: 'hsl(42,90%,54%)',
-      items: ['Tokenized carbon credit batches', 'Marketplace: airtime & data bundles', 'National Dashboard for impact', '5,000 users • First carbon credit sale'],
+      items: ['Tokenized carbon credit batches', 'Marketplace: airtime & data bundles', 'National Dashboard for impact', '10,000 users • First carbon credit sale'],
     },
   ];
   return (
@@ -312,9 +312,9 @@ export const PilotSlide = () => {
 // Slide 8: Ask & Impact
 export const AskSlide = () => {
   const metrics = [
-    { value: '5,000', label: 'Youth Onboarded' },
-    { value: '10,000+', label: 'Sigma Transactions' },
-    { value: '5,000', label: 'Trees Planted' },
+    { value: '10,000', label: 'Youth Onboarded' },
+    { value: '25,000+', label: 'Sigma Transactions' },
+    { value: '10,000', label: 'Trees Planted' },
     { value: '60%+', label: 'User Retention' },
   ];
   return (
@@ -327,12 +327,12 @@ export const AskSlide = () => {
         </motion.h2>
         <motion.div initial="hidden" animate="visible" custom={0.5} variants={fadeUp}
           className="px-[48px] py-[24px] rounded-[20px] bg-[hsl(42,90%,54%,0.1)] border border-[hsl(42,90%,54%,0.3)]">
-          <span className="text-[36px] font-display font-bold text-[hsl(42,90%,54%)]">$100,000 USD</span>
+          <span className="text-[36px] font-display font-bold text-[hsl(42,90%,54%)]">$85,000 USD</span>
           <span className="text-[24px] text-[hsl(210,10%,55%)] ml-[16px]">Seed Funding</span>
         </motion.div>
         <motion.p initial="hidden" animate="visible" custom={1} variants={fadeUp}
           className="text-[24px] text-[hsl(210,10%,55%)] max-w-[800px]">
-          12-month pilot in Lagos, Nigeria targeting measurable impact across employment, skills, and climate action.
+          12-month pilot across Lagos, Ogun & Ondo states targeting measurable impact across employment, skills, and climate action.
         </motion.p>
         <div className="grid grid-cols-4 gap-[40px] mt-[24px]">
           {metrics.map((m, i) => (
