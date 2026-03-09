@@ -39,7 +39,7 @@ export const TitleSlide = () => (
         className="flex items-center gap-[16px] mt-[24px]"
       >
         <span className="px-[24px] py-[12px] rounded-full border border-[hsl(145,80%,42%,0.3)] text-[20px] text-[hsl(145,80%,48%)] font-semibold">
-          🇳🇬 Lagos, Nigeria
+          🇳🇬 Lagos, Ogun & Ondo, Nigeria
         </span>
         <span className="px-[24px] py-[12px] rounded-full border border-[hsl(42,90%,54%,0.3)] text-[20px] text-[hsl(42,90%,54%)] font-semibold">
           Base L2 • ERC-20
