@@ -17,6 +17,7 @@ import AdminPage from "./pages/AdminPage";
 import ProfilePage from "./pages/ProfilePage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PublicProfilePage from "./pages/PublicProfilePage";
+import PitchDeckPage from "./pages/PitchDeckPage";
 import NotFound from "./pages/NotFound";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
