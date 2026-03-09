@@ -64,20 +64,20 @@ const Dashboard = () => {
       <motion.div variants={item}>
         <Card className="overflow-hidden border-0 gradient-hero">
           <CardContent className="p-6">
-            <p className="text-sm text-primary-foreground/80">Welcome back,</p>
-            <h1 className="font-display text-2xl font-bold text-primary-foreground">
+            <p className="text-sm text-white/80">Welcome back,</p>
+            <h1 className="font-display text-2xl font-bold text-white">
               {profile?.full_name || 'Youth Champion'} 👋
             </h1>
             <div className="mt-4 flex items-center gap-3">
-              <div className="flex items-center gap-2 rounded-full bg-primary-foreground/20 px-4 py-2 backdrop-blur-sm">
+              <div className="flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 backdrop-blur-sm">
                 <Wallet className="h-4 w-4 text-secondary" />
-                <span className="font-display text-lg font-bold text-primary-foreground">
+                <span className="font-display text-lg font-bold text-white">
                   {profile?.zlto_balance || 0}
                 </span>
-                <span className="text-xs text-primary-foreground/80">SIGMA</span>
+                <span className="text-xs text-white/80">SIGMA</span>
               </div>
               {walletAddress && (
-                <Badge variant="outline" className="border-primary-foreground/30 text-primary-foreground/80 text-[10px]">
+                <Badge variant="outline" className="border-white/30 text-white/80 text-[10px]">
                   {shortenAddress(walletAddress)}
                 </Badge>
               )}
