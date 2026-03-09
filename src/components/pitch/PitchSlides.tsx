@@ -332,7 +332,7 @@ export const AskSlide = () => {
         </motion.div>
         <motion.p initial="hidden" animate="visible" custom={1} variants={fadeUp}
           className="text-[24px] text-[hsl(210,10%,55%)] max-w-[800px]">
-          12-month pilot in Lagos, Nigeria targeting measurable impact across employment, skills, and climate action.
+          12-month pilot across Lagos, Ogun & Ondo states targeting measurable impact across employment, skills, and climate action.
         </motion.p>
         <div className="grid grid-cols-4 gap-[40px] mt-[24px]">
           {metrics.map((m, i) => (
